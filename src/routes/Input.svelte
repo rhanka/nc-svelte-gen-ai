@@ -1,22 +1,22 @@
 <script>
   import { onMount } from "svelte";
-	import { marked } from 'marked';
-  export let label = ""; // Le label affiché au-dessus
+	import { marked } from 'marked';
+  export let label = ""; // Le label affichï¿½ au-dessus
   export let value = ""; // La valeur de l'input
 
-	let isEditing = false; // Définit si nous sommes en mode édition ou non
+	let isEditing = false; // Dï¿½finit si nous sommes en mode ï¿½dition ou non
 	export let markdown = false;
 
-	// Référence pour le span et l'input
+	// Rï¿½fï¿½rence pour le span et l'input
   let span;
   let input;
 	let textarea;
-	
-  // Basculer entre le mode édition et le mode affichage
+
+  // Basculer entre le mode ï¿½dition et le mode affichage
   const toggleEditing = () => {
     isEditing = !isEditing;
   };
- 
+
 	$: textarea && adjustHeight() && setTimeout(() => {
 	  textarea.focus();
 	}, "150");
@@ -25,7 +25,7 @@
   const adjustWidth = () => {
 		if (!markdown) {
 	    if (span && input) {
-	      span.textContent = value || " "; // Mise à jour du contenu du span
+	      span.textContent = value || " "; // Mise ï¿½ jour du contenu du span
 	      input.style.width = `${span.offsetWidth+4}px`; // Appliquer la largeur au champ input
 	    }
 		}
@@ -34,19 +34,19 @@
 	// Ajuster la hauteur du textarea en fonction de son contenu
   const adjustHeight = () => {
     if (textarea) {
-      textarea.style.height = "auto"; // Réinitialise la hauteur
-      textarea.style.height = `${textarea.scrollHeight}px`; // Définit la hauteur basée sur le contenu
+      textarea.style.height = "auto"; // Rï¿½initialise la hauteur
+      textarea.style.height = `${textarea.scrollHeight}px`; // Dï¿½finit la hauteur basï¿½e sur le contenu
     }
   };
 
 	onMount(() => adjustWidth());
-	
+
   // Surveillez les changements de `value`
   $: if (value) { adjustWidth() };
 
 </script>
 
-<div 
+<div
 	class="editable-container"
 	style={markdown ? "width: 100%!important": ""}
 >
@@ -85,7 +85,7 @@
 
 <style>
   .editable-container {
-    display: inline-flex; /* Permet d'afficher les champs côte à côte */
+    display: inline-flex; /* Permet d'afficher les champs cï¿½te ï¿½ cï¿½te */
     flex-direction: column; /* Label au-dessus de l'input */
     margin-right: 0; /* Espacement entre les inputs */
 		vertical-align: bottom;
@@ -95,8 +95,8 @@
     display: block;
     font-size: 0.5rem;
 	  font-weight: 100; /* Police fine */
-	  font-family: "Helvetica Neue", Arial, sans-serif; /* Typographie moderne et légère */
-	  
+	  font-family: "Helvetica Neue", Arial, sans-serif; /* Typographie moderne et lï¿½gï¿½re */
+
     color: #555;
     margin-bottom: 0rem;
   }
@@ -116,7 +116,7 @@
 
 	textarea:focus {
 	  border: 1px solid #ccc; /* Ajout du style de bordure */
-	  outline: none; /* Supprime l'effet par défaut du focus */
+	  outline: none; /* Supprime l'effet par dï¿½faut du focus */
 	}
 
   .size-measure {
@@ -129,15 +129,15 @@
     position: absolute;
     pointer-events: none;
   }
-	
+
   .editable-input {
     border: none;
     border-bottom: 1px solid transparent;
     outline: none;
-    font-size: inherit; /* Hérite de la taille de police du parent */
-    color: inherit; /* Hérite de la couleur du texte du parent */
-    font-weight: inherit; /* Hérite du poids de la police */
-    line-height: inherit; /* Hérite de l'interligne */
+    font-size: inherit; /* Hï¿½rite de la taille de police du parent */
+    color: inherit; /* Hï¿½rite de la couleur du texte du parent */
+    font-weight: inherit; /* Hï¿½rite du poids de la police */
+    line-height: inherit; /* Hï¿½rite de l'interligne */
 		vertical-align: baseline; /* Aligne l'input avec la ligne de base du texte */
     padding: 0;
     background: none;

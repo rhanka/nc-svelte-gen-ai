@@ -1,11 +1,11 @@
 
 <script>
   import { marked } from 'marked'; // Import the marked library
-	//import { DeepChat } from "deep-chat";
+	import { DeepChat } from "deep-chat";
 	let aiUrl = 'https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/ai';
 	export let referencesList = [];
 	import { createdItem, updateCreatedItem } from './store.js'
-	
+
   const history = [
     { role: "system", text: "How can I help you today?" }
   ];
@@ -20,7 +20,7 @@
 			let role = currentTask();
 			console.log('response',json);
 			$updateCreatedItem = { role: role, label: json.label, description: json.description};
-			return {html: marked(json.text)}; // Retourner le JSON à DeepChat
+			return {html: marked(json.text)}; // Retourner le JSON ï¿½ DeepChat
     } catch (e) {
       console.error("Erreur lors du parsing du JSON:", e);
       return { error: "Invalid JSON format" }; // Retourner une erreur si le JSON est invalide
@@ -36,7 +36,7 @@
 		if ($createdItem['analysis_history']['100'].length > 0) { return '100'}
 		return '000';
 	}
-	
+
 	const requestInterceptor = (requestDetails) => {
 		let role = currentTask();
 		requestDetails.body.messages[0].role = role;
