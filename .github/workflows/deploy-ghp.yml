@@ -46,12 +46,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-    - name: Download build artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: build-artifact
-        path: ./build
-
     - name: Deploy
       id: deployment
       uses: actions/deploy-pages@v4
