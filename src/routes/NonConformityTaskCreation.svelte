@@ -2,13 +2,14 @@
   import { marked } from 'marked'; // Import the marked library
 	import Input from './Input.svelte';
 	import Dropzone from "svelte-file-dropzone";
+	import { taskLabel, createdItem } from './store.js';
 
 	export let task;
 	export let history = [];
 	export let expand;
 	export let dropzone = false;
-	export let image;
-	
+	let image;
+
 	let step_template = {
 		label: "<Please provide a short label for non-conformity>",
 		description:"Please provide a concise and precise description for this task",
@@ -40,19 +41,26 @@
   function handleRemoveAll() {
     files.accepted = [];
   }
-	
+
+  function handleClick() {
+	expand = !expand;
+	if (expand) {
+		$createdItem.currentTask = task;
+	}
+  }
+
 </script>
 
 <div style="padding: 0; border-bottom: 1px solid #eee; margin-top:-2px; list-style-type: none;">
 	{#if task}
-		<button 
-          type="button" 
-          on:click={() => {expand = !expand}} 
-          on:keypress={(e) => e.key === 'Enter' && (expand=!expand)} 
+		<button
+          type="button"
+          on:click={handleClick}
+          on:keypress={(e) => e.key === 'Enter' && handleClick()}
           style="cursor: pointer; padding: 0px; width: 100%; text-align: left; border: none; background: #eee;">
 					<h3>
 						<span style="padding: 0 8px;">{expand ? '-' : '+'}</span>
-						{task}
+						{taskLabel[task]}
 					</h3>
 		</button>
 	{/if}
@@ -63,13 +71,13 @@
 			{#each history as step}
 				<li style="padding: 8px; border-bottom: 1px solid #eee;">
 					<h4><Input bind:value={step.label} label="Label"/> - <Input bind:value={step.date} label="Date"/> </h4>
-				
+
 					<Input label="Role" bind:value={step['role']}/> -
 					<Input label="Author" bind:value={step['name']}/>
-					
+
 					<br><br>
 					<div>
-						<Input bind:value={step.description} label="Description" markdown={true}/> 
+						<Input bind:value={step.description} label="Description" markdown={true}/>
 					</div>
 				</li>
 			{/each}
@@ -81,9 +89,9 @@
 					<div class="image-preview">
 						{#each files.accepted as file, index}
 							<div class="img-container">
-								<img 
-									src={URL.createObjectURL(file)} 
-									alt={`Preview of ${file.name}`} 
+								<img
+									src={URL.createObjectURL(file)}
+									alt={`Preview of ${file.name}`}
 									class="preview-img"
 								/>
 								<br>
@@ -99,7 +107,7 @@
 			{/if}
 	  </div>
 </div>
-	
+
 </div>
 
 <style>
@@ -111,7 +119,7 @@
   /* Conteneur global */
   .container {
     display: flex;
-    flex-wrap: wrap; /* Permet aux colonnes de passer à la ligne si nécessaire */
+    flex-wrap: wrap; /* Permet aux colonnes de passer ï¿½ la ligne si nï¿½cessaire */
     gap: 1rem; /* Espacement entre les colonnes */
   }
 
@@ -119,14 +127,14 @@
   .left-column {
 		padding-right: 0.5rem;
     flex: 2; /* 2/3 de l'espace disponible */
-    min-width: 200px; /* Largeur minimale pour éviter un écrasement trop important */
+    min-width: 200px; /* Largeur minimale pour ï¿½viter un ï¿½crasement trop important */
   }
 
   /* Colonne de droite */
   .right-column {
 		padding-top: 2rem;
     flex: 1; /* 1/3 de l'espace disponible */
-    min-width: 200px; /* Largeur minimale pour éviter un écrasement trop important */
+    min-width: 200px; /* Largeur minimale pour ï¿½viter un ï¿½crasement trop important */
   }
 
   /* Gestion des colonnes en mode responsive */
@@ -143,7 +151,7 @@
   .image-preview {
     margin-top: 1rem;
   }
-																												
+
   .img-container {
 		display: flex;
     flex-direction: column;
@@ -159,7 +167,7 @@
   }
  button {
     margin-top: 0.5rem;
-		border: none; 
+		border: none;
 		background: #eee;
     cursor: pointer;
   }
@@ -168,6 +176,6 @@
     background: #e9e9e9;
   }
 
-																	
+
 </style>
 
