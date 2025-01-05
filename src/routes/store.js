@@ -1,5 +1,13 @@
 import { writable } from 'svelte/store';
 
-// Crée un store pour stocker les données des événements
+// Crï¿½e un store pour stocker les donnï¿½es des ï¿½vï¿½nements
 export const createdItem = writable(null);
 export const updateCreatedItem = writable(null);
+export const taskLabel = {
+    "000": "Non-Conformity Report",
+    "100": "Task 100 - Analysis",
+    "200": "Task 200 - Analysis Validation",
+    "300": "Task 300 - Stress Analysis",
+    "400": "Task 400 - Stress Analysis Validation",
+    "500": "Task 500 - Final Analysis Validation"
+  }
