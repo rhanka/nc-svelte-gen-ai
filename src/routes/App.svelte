@@ -1,24 +1,24 @@
 <script>
 	import { run } from 'svelte/legacy';
 
-  import NonConformityList from './NonConformityList.svelte';
-  import DocumentsList from './DocumentsList.svelte';
-  import NonConformityDetail from './NonConformityDetail.svelte';
-  import ShowDocument from './ShowDocument.svelte';
-  import NonConformityCreation from './NonConformityCreation.svelte';
+	import NonConformityList from './NonConformityList.svelte';
+	import DocumentsList from './DocumentsList.svelte';
+	import NonConformityDetail from './NonConformityDetail.svelte';
+	import ShowDocument from './ShowDocument.svelte';
+	import NonConformityCreation from './NonConformityCreation.svelte';
 	import Chatbot from './Chatbot.svelte';
-  import Pane from './Pane.svelte';
+	import PaneItem from './PaneItem.svelte';
 	import Tabs from './Tabs.svelte';
 	import { nonConformities } from './non_conformities.js';
 
 	let maxRows=5000;
 	let apiUrl = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/nc?max_rows=${maxRows}`;
-	let nonConformitiesList = $state(nonConformities);
+	let nonConformitiesList = $state(sortNC(nonConformities));
 	let nonConformitiesFilter = $state();
 	let nc_num = $state(0);
 	let doc_num = $state(0);
-  let selectedItem = $state(null);
-  let selectedDoc = null;
+	let selectedItem = $state(null);
+	let selectedDoc =  $state(null);
 	let referencesList= $state([]);
 	let documentsList= $state([]);
 	let tabs = $state([]);
@@ -28,24 +28,36 @@
 		console.log(history);
 	});
 
-  function handleSelect(event) {
-    selectedItem = event.detail.item;
+	function sortNC(list) {
+		return list.sort(
+			(a, b) => new Date(b['nc_event_date']) - new Date(a['nc_event_date'])
+		);
+	}
+
+	function handleSelect(event) {
+		selectedItem = event.detail.item;
 		activeTabValue = 2;
-		console.log(selectedItem)
-  }
+		console.log(selectedItem);
+	}
+
+	function handleDocumentSelect(event) {
+		selectedDoc = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/doc/${event.detail.doc.doc.replace(/\.md/,'.pdf')}`;
+		activeTabValue = 3;
+		console.log('app to pdf',selectedDoc);
+	}
 
 	async function getData () {
 		try {
         let response = await fetch(apiUrl, {
-            method: 'GET', 
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             }
-        }); 
+        });
         if (response.ok) {
-            nonConformitiesList = await response.json();
-            console.log(`fetched ${nonConformitiesList.length} non conformities`); // Affiche les données JSON
+            nonConformitiesList = sortNC(await response.json());
+            console.log(`fetched ${nonConformitiesList.length} non conformities`); // Affiche les donnï¿½es JSON
         } else {
             console.error('HTTP error', response.status);
         }
@@ -54,34 +66,36 @@
     }
 	}
 
-		run(() => {
-		tabs = [
-			    {
-						label: "Non Conformity Creation",
-						value: 1,
-						active: true,
-						arguments: {
-							history: history
-						},
-						component: NonConformityCreation
-					},
-			    {
-						label: "Non Conformity Reference",
-						value: 2,
-						active: selectedItem,
-						component: NonConformityDetail,
-						arguments: {
-							selectedItem: selectedItem
-						}
-					},
-			    {
-						label: "Document",
-						value: 3,
-						component: ShowDocument,
-						argument: selectedDoc,
-						active: selectedDoc
-					}
-			  ];
+	run(() => {
+	tabs = [
+		{
+			label: "Non Conformity Creation",
+			value: 1,
+			active: true,
+			arguments: {
+				history: history
+			},
+			component: NonConformityCreation
+		},
+		{
+			label: "Non Conformity Reference",
+			value: 2,
+			active: selectedItem,
+			component: NonConformityDetail,
+			arguments: {
+				selectedItem: selectedItem
+			}
+		},
+		{
+			label: "Document",
+			value: 3,
+			active: selectedDoc,
+			component: ShowDocument,
+			arguments: {
+				url: selectedDoc
+			}
+		}
+		];
 	});
 
 	getData();
@@ -101,60 +115,77 @@
 <main>
   <div class="container">
     <div
-			class="pane left_selected"
-		>
-			<Pane expand={false} title="AI Agent">
-				<Chatbot bind:referencesList={referencesList} />
-			</Pane>
-			<Pane expand={true} title="Non Conformities List" num={nc_num}>
-				<NonConformityList 
+		class="pane left"
+	>
+		<div style="padding-top:1rem;">
+			<PaneItem
+				expand={true}
+				title="Non Conformities List"
+				num={nc_num}
+			>
+				<NonConformityList
 					nonConformities={nonConformitiesList}
 					nonConformitiesFilter={nonConformitiesFilter}
 					bind:num={nc_num}
-					on:select={handleSelect} />
-			</Pane>
-			<Pane expand={false} title="Documents" num={doc_num}>
-				<DocumentsList 
+					on:select={handleSelect}
+				>
+				</NonConformityList>
+			</PaneItem>
+			<PaneItem
+				expand={false}
+				title="Documents"
+				num={doc_num}
+			>
+				<DocumentsList
 					documentsList={documentsList}
-					on:select={handleSelect} />
-			</Pane>
+					on:selectDoc={handleDocumentSelect}
+				>
+				</DocumentsList>
+			</PaneItem>
+
+		</div>
+		<div style="position: absolute;bottom:0">
+			<PaneItem
+				expand={false}
+				title="AI Agent"
+				num={undefined}
+			>
+				<Chatbot bind:referencesList={referencesList}>
+				</Chatbot>
+			</PaneItem>
+		</div>
     </div>
-		
-		<div class="pane right">
-			<Tabs 
-				items={tabs}
-				bind:activeTabValue={activeTabValue}
-			/>
-       <!-- 
-				<NonConformityDetail {selectedItem} on:closeDetail={closeDetail} />
-			 !-->
-      </div>
+	<div class="pane right">
+		<Tabs
+			items={tabs}
+			bind:activeTabValue={activeTabValue}
+		>
+		</Tabs>
+	</div>
   </div>
 </main>
 
 <style>
   main {
-    padding: 1rem;
+    padding: 0rem;
   }
   .container {
     display: flex;
     flex-direction: row;
-		margin: 0px;
-		padding: 0px
+	margin: 0px;
+	padding: 0px;
   }
   .pane {
     padding: 0rem;
-	  transition: width 0.3s;
+	transition: width 0.3s;
+	height:100vh;
+	overflow-y: auto;
   }
   .left {
-    width: 100%;
-		min-width:320px;
-		overflow-y: auto;
-  }
-  .left_selected {
     width: 20%;
-		min-width:320px;
-		overflow-y: auto;
+	min-width:320px;
+    display: flex;
+    flex-direction: column;
   }
   .right {
     width: 80%;
