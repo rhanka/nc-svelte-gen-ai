@@ -17,7 +17,7 @@
     try {
       const json = JSON.parse(text);
 			referencesList = json.sources;
-			let role = currentTask();
+			let role = $createdItem.currentTask;
 			console.log('response',json);
 			$updateCreatedItem = { role: role, label: json.label, description: json.description};
 			return {html: marked(json.text)}; // Retourner le JSON � DeepChat
@@ -40,10 +40,19 @@
 	const requestInterceptor = (requestDetails) => {
 		let role = currentTask();
 		requestDetails.body.messages[0].role = role;
-	  requestDetails.body.messages[0].text = `
+		const ncHistory = ['000', '100', '200', '300', '400', '500']
+			.filter((key) => key < role)
+			.map((key) => JSON.stringify($createdItem['analysis_history'][key]));
+		const ncHistoryPrompt = role === '000' ? '' : `
+		The non-conformity history is as follows: ${JSON.stringify(ncHistory)}
+		`
+	  	requestDetails.body.messages[0].text = `
 I have the role for task ${role}
 
+${ncHistoryPrompt}
+
 I'm editing current task: ${JSON.stringify($createdItem['analysis_history'][role][0])}
+
 
 Please helping me the base update for this task and following specific request: ${requestDetails.body.messages[0].text}
 `
