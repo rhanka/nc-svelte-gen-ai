@@ -1,23 +1,23 @@
 <script>
-  import { marked } from 'marked'; // Import the marked library
-
+	import { marked } from 'marked'; // Import the marked library
+	import { taskLabel } from './store.js';
 	export let task;
 	export let history;
 	export let expand;
-	
+
 </script>
 
 <div style="padding: 0; border-bottom: 1px solid #eee; margin-top:-2px; list-style-type: none;">
 	{#if task}
-		<button 
-          type="button" 
-          on:click={() => {expand = !expand}} 
-          on:keypress={(e) => e.key === 'Enter' && selectItem(item)} 
-          style="cursor: pointer; padding: 0px; width: 100%; text-align: left; border: none; background: #eee;">
-					<h3>
-						<span style="padding: 0 8px;">{expand ? '-' : '+'}</span>
-						{task}
-					</h3>
+		<button
+			type="button"
+			on:click={() => {expand = !expand}}
+			on:keypress={(e) => e.key === 'Enter' && selectItem(item)}
+			style="cursor: pointer; padding: 0px; width: 100%; text-align: left; border: none; background: #eee;">
+				<h3>
+					<span style="padding: 0 8px;">{expand ? '-' : '+'}</span>
+					{taskLabel[task]}
+				</h3>
 		</button>
 	{/if}
 	{#if history && expand}
@@ -33,9 +33,9 @@
 </div>
 
 <style>
-  li {
-    padding: 1rem;
-	  transition: width 0.3s;
-  }
+	li {
+		padding: 1rem;
+		transition: width 0.3s;
+	}
 </style>
 
