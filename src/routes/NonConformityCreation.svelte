@@ -36,6 +36,7 @@
 				label: $updateCreatedItem.label,
 				description: $updateCreatedItem.description
 			};
+			$updateCreatedItem = null;
 		}
 
 		$: if (
@@ -80,6 +81,7 @@
 		<NonConformityTaskCreation
 			dropzone={task === '000'}
 			expand={task === '000'}
+			aiHelp={['000','100'].includes(task)}
 			task={task}
 			bind:history={history[task]}
 		>

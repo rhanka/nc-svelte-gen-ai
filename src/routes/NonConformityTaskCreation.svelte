@@ -1,8 +1,9 @@
 <script>
-  import { marked } from 'marked'; // Import the marked library
+  	import { marked } from 'marked'; // Import the marked library
 	import Input from './Input.svelte';
 	import Dropzone from "svelte-file-dropzone";
-	import { taskLabel, createdItem } from './store.js';
+	import { taskLabel, createdItem, isUpdating, askForHelp } from './store.js';
+  	export let aiHelp = false;
 
 	export let task;
 	export let history = [];
@@ -58,15 +59,25 @@
           on:click={handleClick}
           on:keypress={(e) => e.key === 'Enter' && handleClick()}
           style="cursor: pointer; padding: 0px; width: 100%; text-align: left; border: none; background: #eee;">
-					<h3>
-						<span style="padding: 0 8px;">{expand ? '-' : '+'}</span>
-						{taskLabel[task]}
-					</h3>
+			<h3>
+				<span style="padding: 0 8px;">{expand ? '-' : '+'}</span>
+				{taskLabel[task]}
+				{#if aiHelp}
+					<a
+						href="/"
+						on:click|stopPropagation|preventDefault={() => $askForHelp=task}
+          				on:keypress={(e) => {if (e.key === 'Enter') {$askForHelp = task}}}
+						style="cursor: help; text-decoration:none; padding: 0px; width: 100%; text-align: left; border: none; background: transparent;"
+					>
+					🪄
+					</a>
+				{/if}
+			</h3>
 		</button>
 	{/if}
 
 	<div class="container">
-	  <div class="left-column">
+	  <div class="left-column {$isUpdating === task ? 'gradiant' : ''}">
 	    {#if history && history.length && expand}
 			{#each history as step}
 				<li style="padding: 8px; border-bottom: 1px solid #eee;">
@@ -77,7 +88,11 @@
 
 					<br><br>
 					<div>
-						<Input bind:value={step.description} label="Description" markdown={true}/>
+						<Input
+							bind:value={step.description}
+							label="Description"
+							markdown={true}
+						/>
 					</div>
 				</li>
 			{/each}
@@ -176,6 +191,23 @@
     background: #e9e9e9;
   }
 
+
+	@keyframes gradient {
+		0% {
+		background-position: 0% 50%;
+		}
+		100% {
+		background-position: 100% 50%;
+		}
+	}
+
+	.gradiant {
+		background: linear-gradient(90deg, #333, #666, #aaa, #eee, #aaa, #555, #222);
+    	background-size: 400% 100%; /* Assurez-vous que le gradient est assez large pour bouger */
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		animation: gradient 1.5s infinite linear;
+	}
 
 </style>
 

@@ -80,7 +80,6 @@
 			bind:this={textarea}
 		></textarea>
   {/if}
-
 </div>
 
 <style>
