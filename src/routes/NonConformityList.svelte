@@ -14,23 +14,34 @@
     }
 
     // Filter items based on the search
-    $: filteredItems = nonConformities.filter(item => {
-	      const query = searchQuery.toLowerCase();
-	      return (
-	        item['nc_event_id'].toLowerCase().includes(query) ||
-	        item['ATA_category'].toLowerCase().includes(query) ||
-	        JSON.stringify(item['analysis_history']).toLowerCase().includes(query) // Added description to the search
-	      );
-	    }).filter(item => {
-			if (nonConformitiesFilter.length > 0) {
-				return nonConformitiesFilter.some(n => n.doc === item['nc_event_id'])
-			} else {
-				return true;
-			}
+    $: if (!searchQuery && nonConformitiesFilter.length === 0) {
+	  filteredItems = nonConformities;
+	} else if (searchQuery && nonConformitiesFilter.length === 0) {
+		const query = searchQuery.toLowerCase();
+		filteredItems = nonConformities.filter(item => {
+			return (
+			item['nc_event_id'].toLowerCase().includes(query) ||
+			item['ATA_category'].toLowerCase().includes(query) ||
+			JSON.stringify(item['analysis_history']).toLowerCase().includes(query) // Added description to the search
+			);
 		});
-		$: num = filteredItems.length;
+	} else {
+		filteredItems = nonConformities
+			.filter(item => nonConformitiesFilter.some(n => n.doc === item['nc_event_id']))
+			.map(item => {
+				return {
+					...item,
+					relevance_score: nonConformitiesFilter
+						.filter(n => n.doc === item['nc_event_id'])
+						.reduce((maxScore, n) => Math.max(maxScore, n.relevance_score), 0)
+				}
+			})
+			.sort((a, b) => a.relevance_score - b.relevance_score)
+	}
 
-		$: console.log(nonConformitiesFilter)
+	$: num = filteredItems.length;
+
+	$: console.log(nonConformitiesFilter)
   </script>
 
   <div>
