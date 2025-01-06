@@ -182,8 +182,7 @@
 	overflow-y: auto;
   }
   .left {
-    width: 20%;
-	min-width:320px;
+    width: 25vw;
     display: flex;
     flex-direction: column;
   }

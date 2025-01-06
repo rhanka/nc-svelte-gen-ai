@@ -74,7 +74,7 @@
 	input {
 		padding: 0.35rem!important;
 		margin-bottom: 1rem;
-		width: 285px;
+		width: 22vw;
 		font-size: 0.9rem;
 	}
 	.scrollable {

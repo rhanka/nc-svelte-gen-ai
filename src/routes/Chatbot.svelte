@@ -63,7 +63,7 @@ Please helping me the base update for this task and following specific request: 
 	};
 </script>
 
-<main style="margin: -4px;">
+<main style="margin: 0px;">
   <deep-chat
 		bind:this={chatElementRef}
 		avatars={{
@@ -124,12 +124,12 @@ Please helping me the base update for this task and following specific request: 
 			}
 		}}
 		responseInterceptor={responseInterceptor}
-	  	requestInterceptor={requestInterceptor}
-    	history={history}
+		requestInterceptor={requestInterceptor}
+		history={history}
 		chatStyle={{
 			"border": "0px",
-			"width": "300px",
-			"height": "250px"
+			"width": "22.75vw",
+			"height": "30vh"
 		}}
 		htmlClassUtilities = {{
 			'custom-button': {
