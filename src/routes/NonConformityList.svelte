@@ -36,7 +36,7 @@
 						.reduce((maxScore, n) => Math.max(maxScore, n.relevance_score), 0)
 				}
 			})
-			.sort((a, b) => a.relevance_score - b.relevance_score)
+			.sort((a, b) =>  b.relevance_score - a.relevance_score)
 	}
 
 	$: num = filteredItems.length;
@@ -70,7 +70,7 @@
 			on:click={() => selectItem(item)}
 			on:keypress={(e) => e.key === 'Enter' && selectItem(item)}
 			style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;">
-			<strong>{item['ATA_code']} - {item['ATA_category']} - {item['nc_event_date'].slice(0, 10)}  </strong>
+			<strong>{item['ATA_code']} - {item['ATA_category']} - {item['nc_event_date'].slice(0, 10)} </strong>
 			<p style="margin-top:0.5rem;margin-bottom:0">{item['analysis_history']['000'][0]['label'].slice(0, 100)}...</p>
 			</button>
 		</li>

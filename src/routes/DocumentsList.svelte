@@ -30,7 +30,7 @@
             on:keypress={(e) => e.key === 'Enter' && selectDoc(doc)}
             style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;">
             <strong>{doc.doc.replace(/\.md$/,'.pdf')}  </strong>
-            <p style="margin-top:0.2rem;margin-bottom:0rem;">{doc.chunk.slice(0,100)}...</p>
+            <p style="margin-top:0.2rem;margin-bottom:0rem;">{doc.chunks[0].chunk.slice(0,100)}...</p>
           </button>
         </li>
       {/each}
