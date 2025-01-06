@@ -11,3 +11,5 @@ export const taskLabel = {
     "400": "Task 400 - Stress Analysis Validation",
     "500": "Task 500 - Final Analysis Validation"
   }
+export const isUpdating = writable(false);
+export const askForHelp = writable(false);
