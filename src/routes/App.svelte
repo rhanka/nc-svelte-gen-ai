@@ -1,3 +1,4 @@
+<svelte:options runes={false} />
 <script>
 	import { run } from 'svelte/legacy';
 
@@ -10,23 +11,23 @@
 	import PaneItem from './PaneItem.svelte';
 	import Tabs from './Tabs.svelte';
 	import { nonConformities } from './non_conformities.js';
+	import { askForHelp } from './store.js';
 
 	let maxRows=5000;
 	let apiUrl = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/nc?max_rows=${maxRows}`;
-	let nonConformitiesList = $state(sortNC(nonConformities));
-	let nonConformitiesFilter = $state();
-	let nc_num = $state(0);
-	let doc_num = $state(0);
-	let selectedItem = $state(null);
-	let selectedDoc =  $state(null);
-	let referencesList= $state([]);
-	let documentsList= $state([]);
-	let tabs = $state([]);
-	let activeTabValue = $state(1);
+	let nonConformitiesList = sortNC(nonConformities);
+	let nonConformitiesFilter;
+	let nc_num = 0;
+	let doc_num = 0;
+	let selectedItem = null;
+	let selectedDoc = null;
+	let referencesList= [];
+	let documentsList= [];
+	let tabs = [];
+	let activeTabValue = 1;
+	let showChatbot = false;
 
-	run(() => {
-		console.log(history);
-	});
+	$:	console.log('showChatbot',showChatbot);
 
 	function sortNC(list) {
 		return list.sort(
@@ -66,8 +67,7 @@
     }
 	}
 
-	run(() => {
-	tabs = [
+	$: tabs = [
 		{
 			label: "Non Conformity Creation",
 			value: 1,
@@ -96,20 +96,20 @@
 			}
 		}
 		];
-	});
 
 	getData();
 
-	run(() => {
-		if (referencesList.length > 0) {
+	$: if ($askForHelp) {
+		showChatbot = true;
+		$askForHelp = null;
+	}
+
+	$:	if (referencesList.length > 0) {
 			nonConformitiesFilter = referencesList.filter(item => item.doc.includes("ATA"))
 			documentsList = referencesList.filter(item => !item.doc.includes("ATA"))
 		}
-	});
 
-	run(() => {
-		doc_num = documentsList.length;
-	});
+	$:	doc_num = documentsList.length;
 </script>
 
 <main>
@@ -146,7 +146,7 @@
 		</div>
 		<div style="position: absolute;bottom:0">
 			<PaneItem
-				expand={false}
+				bind:expand={showChatbot}
 				title="AI Agent"
 				num={undefined}
 			>
