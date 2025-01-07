@@ -4,13 +4,13 @@
 
 Global components used :
 
-- [Svelte for UI](https://nc.genai-cgi.com), this repo
+- [Svelte for UI](https://svelte.dev) - [this repo](https://nc.genai-cgi.com)
     - Non-Confromity Canevas Creation (interactive creation with AI)
     - Contextual information retrieved with RAG (Non-Conformity history, Tech Docs)
-    - Deep-Chat (deepchat.dev) for backend-less Chatbot
+    - [Deep-Chat](https://deepchat.dev) for backend-less Chatbot
 
 
-- [Dataiku for AI Agent and dataprep ](https://github.com/rhanka/nc-dataiku)
+- [Dataiku](https://dataiku.com) for [AI Agent and dataprep ](https://github.com/rhanka/nc-dataiku)
     - Flask Backend with Agents specialized by task
     - Vector Databases (Chroma DB) for Non Conformity history and Tech docs
     - Tech Doc storage, parsing, chunking and embedding
