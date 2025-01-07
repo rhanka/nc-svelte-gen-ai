@@ -17,6 +17,11 @@ Global components used :
     - Synthetic data creation for Non-Confomity history (5000 tickets with at least five steps)
     - LLM Mesh for OpenAI embeddings and GPT4o/4o-mini, can be replaced by any-LLM with few clicks
 
+The Agent AI works as follows:
+
+- User provide limited input either on a Non-Conformity task field or directly to the deep-chat input.
+- AI Agent looks up to vector databases and provide a json including task fields to update the Non-conformity Edition block (Report or Task 100), reference tech docs and non-conformity tickets (to update left side helpers), and a comment to display within deep-chat
+- User can iterate to make the Non-Conformity task fiels more relevant or to translate it to a more comfortable language.
 
 ![Architecture diagram](architecture.drawio.png)
 
