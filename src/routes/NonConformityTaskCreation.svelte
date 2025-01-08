@@ -20,6 +20,7 @@
 	};
 
 	$: if (expand && history.length === 0) {
+		console.log(history);
 		history[0] = step_template;
 	}
 
