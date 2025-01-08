@@ -3,7 +3,9 @@
 	import Input from './Input.svelte';
 	import Dropzone from "svelte-file-dropzone";
 	import { taskLabel, createdItem, isUpdating, askForHelp } from './store.js';
-  	export let aiHelp = false;
+    import '@fortawesome/fontawesome-free/css/all.css';
+
+	export let aiHelp = false;
 
 	export let task;
 	export let history = [];
@@ -20,7 +22,6 @@
 	};
 
 	$: if (expand && history.length === 0) {
-		console.log(history);
 		history[0] = step_template;
 	}
 
@@ -68,9 +69,9 @@
 						href="/"
 						on:click|stopPropagation|preventDefault={() => $askForHelp=task}
           				on:keypress={(e) => {if (e.key === 'Enter') {$askForHelp = task}}}
-						style="cursor: help; text-decoration:none; padding: 0px; width: 100%; text-align: left; border: none; background: transparent;"
+						style="margin-left:.25rem;cursor: help; text-decoration:none; padding: 0px; width: 100%; text-align: left; border: none; background: transparent;"
 					>
-					🪄
+						<i style="font-size: 1rem;" class="fas fa-wand-magic"></i> <!-- Logout icon -->
 					</a>
 				{/if}
 			</h3>
