@@ -1,8 +1,16 @@
 <script>
+  import Menu from './Menu.svelte';
+  import AuthForm from './AuthForm.svelte';
+
   export let items = [];
   export let activeTabValue = 1;
+  let currentView = 'tabs';
 
   const handleClick = tabValue => () => (activeTabValue = tabValue);
+
+  function handleChangeView(event) {
+    currentView = event.detail.view;
+  }
 
   $: items.forEach(item => {
     if (item.active) {
@@ -11,42 +19,46 @@
   });
 </script>
 
+<Menu on:changeView={handleChangeView} />
+
 <div class="tab-container">
   <ul class="tabs">
     {#each items as item}
-        <li
-          class={activeTabValue === item.value ? 'active' : ''}
+      <li class={activeTabValue === item.value ? 'active' : ''}>
+        <button
+          class={!item.active ? 'inactive' : ''}
+          on:click={item.active !== false ? handleClick(item.value) : null}
+          on:keypress={(e) => e.key === 'Enter' && handleClick(item)}
+          disabled={!item.active}
         >
-          <button
-            class={!item.active ? 'inactive' : ''}
-            on:click={item.active !== false ? handleClick(item.value) : null}
-            on:keypress={(e) => e.key === 'Enter' && handleClick(item)}
-            disabled={!item.active}
-          >
-            {item.label}
-          </button>
-        </li>
+          {item.label}
+        </button>
+      </li>
     {/each}
   </ul>
   <div class="content">
-    {#each items as item}
-      {#if item.loaded}
-        <div class="box" style="display: {activeTabValue == item.value ? "block" : "none"}">
-          <svelte:component this={item.component} {...item.arguments}/>
-        </div>
-      {/if}
-    {/each}
+    {#if currentView === 'tabs'}
+      {#each items as item}
+        {#if item.loaded}
+          <div class="box" style="display: {activeTabValue == item.value ? 'block' : 'none'}">
+            <svelte:component this={item.component} {...item.arguments}/>
+          </div>
+        {/if}
+      {/each}
+    {:else}
+      <AuthForm type={currentView} on:changeView={handleChangeView} />
+    {/if}
   </div>
 </div>
-<style> /* Conteneur principal */
+
+<style>
+  /* Styles existants */
   .tab-container {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Prend toute la hauteur de l'écran */
+    height: 100vh;
     overflow: hidden;
   }
-
-  /* Onglets */
   .tabs {
     display: flex;
     flex-wrap: wrap;
@@ -55,13 +67,11 @@
     list-style: none;
     border-bottom: 1px solid #dee2e6;
     background-color: #f8f9fa;
-    z-index: 10; /* Pour rester au-dessus */
+    z-index: 10;
   }
-
   li {
     margin-bottom: -1px;
   }
-
   button {
     border: 1px solid transparent;
     border-top-left-radius: 0.25rem;
@@ -72,31 +82,25 @@
     cursor: pointer;
     color: #555;
   }
-
   button:disabled {
     color: #ccc;
   }
-
   button:hover {
     border-color: #e9ecef #e9ecef #dee2e6;
   }
-
   li.active > button {
     color: #000;
     background-color: #fff;
     border-color: #dee2e6 #dee2e6 #fff;
   }
-
-  /* Contenu avec défilement */
   .content {
-    flex: 1; /* Prend tout l'espace restant */
-    overflow-y: auto; /* Ajoute le défilement vertical si nécessaire */
+    flex: 1;
+    overflow-y: auto;
     padding: 1rem;
     background-color: #fff;
     border: 1px solid #dee2e6;
     border-top: none;
   }
-
   .box {
     margin-bottom: 10px;
     padding: 0px;

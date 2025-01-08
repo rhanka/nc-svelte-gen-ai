@@ -13,3 +13,4 @@ export const taskLabel = {
   }
 export const isUpdating = writable(false);
 export const askForHelp = writable(false);
+export const accessToken = writable('');
