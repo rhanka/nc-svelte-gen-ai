@@ -17,9 +17,6 @@
     isEditing = !isEditing;
   };
 
-	$: textarea && adjustHeight() && setTimeout(() => {
-	  textarea.focus();
-	}, "150");
 
   // Fonction pour ajuster la largeur de l'input
   const adjustWidth = () => {
@@ -30,10 +27,12 @@
 	    }
 		}
   };
+  $: textarea && adjustHeight();
 
 	// Ajuster la hauteur du textarea en fonction de son contenu
   const adjustHeight = () => {
     if (textarea) {
+      textarea.focus(); // Focus sur le textarea
       textarea.style.height = "auto"; // R�initialise la hauteur
       textarea.style.height = `${textarea.scrollHeight}px`; // D�finit la hauteur bas�e sur le contenu
     }
@@ -65,20 +64,22 @@
 				on:blur={toggleEditing}
 			/>
 	  </div>
-  {:else if !isEditing}
+  {:else}
+    {#if isEditing}
+    <textarea
+      bind:value={value}
+      on:mouseover={adjustHeight}
+      on:focus={adjustHeight}
+      on:blur={toggleEditing}
+      bind:this={textarea}
+    ></textarea>
+    {/if}
     <div
       class="markdown-wrapper"
-      on:click={toggleEditing}
-		>
-			{@html marked(value && value.replace(/###/,"####") || "")}
+      on:click|preventDefault={toggleEditing}
+    >
+      {@html marked(value && value.replace(/###/,"####") || "")}
     </div>
-	{:else}
-		<textarea
-			style="height: 100px;"
-			on:blur={toggleEditing}
-			bind:value={value}
-			bind:this={textarea}
-		></textarea>
   {/if}
 </div>
 

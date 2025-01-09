@@ -9,10 +9,8 @@
 
 
 	$: if ($updateCreatedItem) {
-		$createdItem.analysis_history[$updateCreatedItem.role][0] = {
-			label: $updateCreatedItem.label,
-			description: $updateCreatedItem.description
-		};
+		$createdItem.analysis_history[$updateCreatedItem.role][0].label = $updateCreatedItem.label;
+		$createdItem.analysis_history[$updateCreatedItem.role][0].description = $updateCreatedItem.description;
 		$updateCreatedItem = null;
 	}
 
@@ -40,7 +38,7 @@
 					<Input label="Date" bind:value={$createdItem['nc_event_date']}/>
 			</div>
 			<div style="align:right;padding-right:0.5rem">
-				<button style="align:right;border:none;background:none;" on:click={resetCreatedItem}>
+				<button style="cursor:pointer;align:right;border:none;background:none;" on:click={resetCreatedItem}>
 					<i style="font-size: 1rem;" class="fas fa-trash-alt"></i> <!-- Logout icon -->
 				</button>
 			</div>

@@ -34,6 +34,7 @@
     margin: 5px;
     border: none;
     background: none;
+    cursor: pointer;
   }
   button i {
     font-size: 1.5rem; /* Adjust the size as needed */
