@@ -21,7 +21,7 @@
 	let doc_num = 0;
 	let selectedItem = null;
 	let selectedDoc = null;
-	let referencesList= [];
+	let referencesList;
 	let documentsList= [];
 	let tabs = [];
 	let activeTabValue = 1;
@@ -104,12 +104,10 @@
 		$askForHelp = null;
 	}
 
-	$:	if (referencesList.length > 0) {
-			nonConformitiesFilter = referencesList
-				.filter(item => item.doc.includes("ATA"))
-			documentsList = Object.values(referencesList
-				.filter(item => !item.doc.includes("ATA"))
-				.sort((a, b) => a.relevance_score - b.relevance_score)
+	$:	if (referencesList !== undefined) {
+			nonConformitiesFilter = referencesList["non_conformities"]["sources"];
+			documentsList = Object.values(referencesList["tech_docs"]["sources"]
+				//.sort((a, b) => a.relevance_score - b.relevance_score)
 				.reduce((group, item) => {
 					// Si le groupe pour cet ID doc n'existe pas encore, on l'initialise
 					if (!group[item.doc]) {
@@ -118,16 +116,15 @@
 						chunks: [] // Initialisation des chunks
 						};
 					}
-					// Ajouter les propriétés chunk_id, chunk et relevance_score à ce groupe
+					// Ajouter les propriétés chunk_id, chunk à ce groupe
 					group[item.doc].chunks.push({
 						chunk_id: item.chunk_id,
-						chunk: item.chunk,
-						relevance_score: item.relevance_score
+						chunk: item.content,
 					});
 					return group;
 					}, {}
 				) // Initialisation d'un objet vide pour regrouper les items
-			).sort((a, b) => b.chunks[0].relevance_score - a.chunks[0].relevance_score);
+			) //.sort((a, b) => b.chunks[0].relevance_score - a.chunks[0].relevance_score);
 			console.log('doc',documentsList);
 		}
 

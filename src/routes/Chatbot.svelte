@@ -3,7 +3,7 @@
   import { marked } from 'marked'; // Import the marked library
 	import { DeepChat } from "deep-chat";
 	let aiUrl = 'https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/ai';
-	export let referencesList = [];
+	export let referencesList;
 	import { createdItem, updateCreatedItem, isUpdating, askForHelp } from './store.js';
 	let chatElementRef;
 
@@ -15,16 +15,16 @@
     const text = await response.text();
 		// Tenter de parser le texte en JSON
     try {
-      const json = JSON.parse(text);
-			referencesList = json.sources;
-			let role = $createdItem.currentTask;
-			console.log('response',json);
-			$isUpdating = false;
-			$updateCreatedItem = { role: role, label: json.label, description: json.description};
-			return {html: marked(json.text)}; // Retourner le JSON � DeepChat
+		const json = JSON.parse(text);
+		referencesList = json.sources;
+		let role = $createdItem.currentTask;
+		console.log('response',json);
+		$isUpdating = false;
+		$updateCreatedItem = { role: role, label: json.label, description: json.description};
+		return {html: marked(json.text)}; // Retourner le JSON � DeepChat
     } catch (e) {
-      console.error("Erreur lors du parsing du JSON:", e);
-      return { error: "Invalid JSON format" }; // Retourner une erreur si le JSON est invalide
+		console.error("Erreur lors du parsing du JSON:", e);
+		return { error: "Invalid JSON format" }; // Retourner une erreur si le JSON est invalide
     }
 	};
 
@@ -41,25 +41,13 @@
 	const requestInterceptor = (requestDetails) => {
 		let role = currentTask();
 		requestDetails.body.messages[0].role = role;
-		const ncHistory = ['000', '100', '200', '300', '400', '500']
+		requestDetails.body.messages[0].history = ['000', '100', '200', '300', '400', '500']
 			.filter((key) => key < role)
 			.map((key) => JSON.stringify($createdItem['analysis_history'][key]));
-		const ncHistoryPrompt = role === '000' ? '' : `
-		The non-conformity history is as follows: ${JSON.stringify(ncHistory)}
-		`
-	  	requestDetails.body.messages[0].text = `
-I have the role for task ${role}
-
-${ncHistoryPrompt}
-
-I'm editing current task: ${JSON.stringify($createdItem['analysis_history'][role][0])}
-
-
-Please helping me the base update for this task and following specific request: ${requestDetails.body.messages[0].text}
-`
+		requestDetails.body.messages[0].text = JSON.stringify($createdItem['analysis_history'][role][0]);
 		console.log('request', requestDetails)
 		$isUpdating = role;
-	  	return requestDetails;
+		return requestDetails;
 	};
 </script>
 
