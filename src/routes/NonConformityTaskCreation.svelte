@@ -11,6 +11,17 @@
 	export let history = [];
 	export let expand;
 	export let dropzone = false;
+
+	const dict = {
+    	aircraft_id: "Aircraft Serial Number",
+		part_id: "Part number",
+		nc_event_date: "Date"
+	}
+
+	const smartLabel = (key) => {
+		return dict[key] ? dict[key] : key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+	}
+
 	let image;
 
 	let step_template = {
@@ -90,11 +101,39 @@
 
 					<br><br>
 					<div>
-						<Input
-							bind:value={step.description}
-							label="Description"
-							markdown={true}
-						/>
+						{#if typeof step.description === 'string'}
+							<Input
+								bind:value={step.description}
+								label="Description"
+								markdown={true}
+							/>
+						{:else if typeof step.description === 'object'}
+							{#each Object.entries(step.description) as [key, value]}
+								{#if Array.isArray(value)}
+									<Input
+									value={JSON.stringify(step.description[key])}
+									label={key}
+									markdown={true}
+									/>
+								{:else if typeof step.description[key] === 'string'}
+									<h4>{smartLabel(key)}</h4>
+									<Input
+									bind:value={step.description[key]}
+									markdown={true}
+									/>
+								{:else if typeof step.description === 'object'}
+									<h4>{smartLabel(key)}</h4>
+									<ul style="margin-top:0;padding-top:0;padding-bottom:0">
+									{#each Object.entries(step.description[key]) as [key2, value2]}
+										<li style="padding:0"><strong>{smartLabel(key2)}: &nbsp</strong><Input
+										bind:value={step.description[key][key2]}
+										/>
+										</li>
+									{/each}
+									</ul>
+								{/if}
+							{/each}
+						{/if}
 					</div>
 				</li>
 			{/each}
@@ -153,6 +192,20 @@
     flex: 1; /* 1/3 de l'espace disponible */
     min-width: 200px; /* Largeur minimale pour �viter un �crasement trop important */
   }
+
+  h4 {
+    padding-top:0.5rem;
+    padding-bottom:0;
+    margin-top:0;
+    margin-bottom:0;
+  }
+  ul,li{
+    padding-top:0;
+    padding-bottom:0;
+    margin-top:0;
+    margin-bottom:0;
+  }
+
 
   /* Gestion des colonnes en mode responsive */
   @media (max-width: 768px) {

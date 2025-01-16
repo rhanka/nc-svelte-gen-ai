@@ -42,8 +42,7 @@
 	}
 
 	function handleDocumentSelect(event) {
-		selectedDoc = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/doc/${event.detail.doc.doc.replace(/\.md/,'.pdf')}`;
-		activeTabValue = 3;
+		selectedDoc = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/doc/${encodeURIComponent(event.detail.doc.doc.replace(/\.md/, '.pdf'))}`;		activeTabValue = 3;
 		console.log('app to pdf',selectedDoc);
 	}
 
@@ -137,6 +136,19 @@
 		class="pane left"
 	>
 		<div style="padding-top:1rem;">
+			{#if doc_num > 0}
+				<PaneItem
+					expand={true}
+					title="Documents"
+					num={doc_num}
+				>
+					<DocumentsList
+						documentsList={documentsList}
+						on:selectDoc={handleDocumentSelect}
+					>
+					</DocumentsList>
+				</PaneItem>
+			{/if}
 			<PaneItem
 				expand={true}
 				title="Non Conformities List"
@@ -150,18 +162,6 @@
 				>
 				</NonConformityList>
 			</PaneItem>
-			<PaneItem
-				expand={false}
-				title="Documents"
-				num={doc_num}
-			>
-				<DocumentsList
-					documentsList={documentsList}
-					on:selectDoc={handleDocumentSelect}
-				>
-				</DocumentsList>
-			</PaneItem>
-
 		</div>
 		<div style="position: absolute;bottom:0">
 			<PaneItem

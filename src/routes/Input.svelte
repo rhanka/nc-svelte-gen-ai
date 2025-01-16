@@ -42,7 +42,6 @@
 
   // Surveillez les changements de `value`
   $: if (value) { adjustWidth() };
-
 </script>
 
 <div
@@ -83,7 +82,7 @@
   {/if}
 </div>
 
-<style>
+<style global>
   .editable-container {
     display: inline-flex; /* Permet d'afficher les champs c�te � c�te */
     flex-direction: column; /* Label au-dessus de l'input */
@@ -108,10 +107,22 @@
 
 	.markdown-wrapper {
 		width: 100%;
+    padding-left:1rem;
   }
 
+  :global(.markdown-wrapper > :first-child) {
+    margin-top:.25rem !important;
+  }
+
+  :global(.markdown-wrapper > :last-child) {
+    margin-bottom:.25rem !important;
+  }
+  :global(.markdown-wrapper > ul) {
+    margin-left:-1rem !important;
+  }
 	textarea {
 		border: 1px;
+    margin-left: 1rem;
 	}
 
 	textarea:focus {
