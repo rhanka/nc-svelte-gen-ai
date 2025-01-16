@@ -13,6 +13,11 @@
       dispatch('select', { item });
     }
 
+	const orderMap = nonConformitiesFilter.reduce((acc, item, index) => {
+		acc[item.doc] = index;
+		return acc;
+	}, {});
+
     // Filter items based on the search
     $: if (!searchQuery && nonConformitiesFilter.length === 0) {
 	  filteredItems = nonConformities;
@@ -28,15 +33,7 @@
 	} else {
 		filteredItems = nonConformities
 			.filter(item => nonConformitiesFilter.some(n => n.doc === item['nc_event_id']))
-			.map(item => {
-				return {
-					...item,
-					relevance_score: nonConformitiesFilter
-						.filter(n => n.doc === item['nc_event_id'])
-						.reduce((maxScore, n) => Math.max(maxScore, n.relevance_score), 0)
-				}
-			})
-			.sort((a, b) =>  b.relevance_score - a.relevance_score)
+			.sort((a, b) => orderMap[a['nc_event_id']] - orderMap[b['nc_event_id']]);
 	}
 
 	$: num = filteredItems.length;
