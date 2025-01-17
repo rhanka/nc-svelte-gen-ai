@@ -1,6 +1,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { marked } from 'marked'; // Import the marked library
+    import { referencesList } from './store';
 
     export let documentsList = [];
     const dispatch = createEventDispatcher();
@@ -14,7 +15,10 @@
 
   <div>
 		{#if documentsList.length > 0}
-			<button on:click={() => documentsList = []} style="width: 100%;padding: 0.3rem;background-color: #cecece; border: none; cursor: pointer;">
+			<button
+        on:click={() => {documentsList = []; $referencesList = '' }}
+        style="width: 100%;padding: 0.3rem;background-color: #cecece; border: none; cursor: pointer;"
+      >
         Clean AI Filter
       </button>
 		{/if}

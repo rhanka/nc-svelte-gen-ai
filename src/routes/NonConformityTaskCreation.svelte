@@ -8,7 +8,6 @@
 	export let aiHelp = false;
 
 	export let task;
-	export let history = [];
 	export let expand;
 	export let dropzone = false;
 
@@ -32,8 +31,8 @@
 		date: (new Date()).toISOString()
 	};
 
-	$: if (expand && history.length === 0) {
-		history[0] = step_template;
+	$: if (expand && $createdItem.analysis_history[task].length === 0) {
+		$createdItem.analysis_history[task][0] = {...step_template};
 	}
 
   let files = {
@@ -45,7 +44,7 @@
     const { acceptedFiles, fileRejections } = e.detail;
     files.accepted = [...files.accepted, ...acceptedFiles];
     files.rejected = [...files.rejected, ...fileRejections];
-		console.log(files.accepted);
+	console.log(files.accepted);
   }
 
   function handleRemoveFile(e, index) {
@@ -91,8 +90,8 @@
 
 	<div class="container">
 	  <div class="left-column {$isUpdating === task ? 'gradiant' : ''}">
-	    {#if history && history.length && expand}
-			{#each history as step}
+	    {#if $createdItem.analysis_history[task] && $createdItem.analysis_history[task].length && expand}
+			{#each $createdItem.analysis_history[task] as step}
 				<li style="padding: 8px; border-bottom: 1px solid #eee;">
 					<h4><Input bind:value={step.label} label="Label"/> - <Input bind:value={step.date} label="Date"/> </h4>
 

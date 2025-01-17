@@ -1,10 +1,10 @@
 
 <script>
-  import { marked } from 'marked'; // Import the marked library
+  	import { marked } from 'marked'; // Import the marked library
 	import { DeepChat } from "deep-chat";
 	let aiUrl = 'https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/ai';
-	export let referencesList;
-	import { createdItem, updateCreatedItem, isUpdating, askForHelp } from './store.js';
+
+	import { createdItem, updateCreatedItem, isUpdating, referencesList, askForHelp } from './store.js';
 	let chatElementRef;
 
   const history = [
@@ -16,7 +16,7 @@
 		// Tenter de parser le texte en JSON
     try {
 		const json = JSON.parse(text);
-		referencesList = json.sources;
+		$referencesList = json.sources;
 		let role = $createdItem.currentTask;
 		console.log('response',json);
 		$isUpdating = false;
@@ -43,8 +43,11 @@
 		requestDetails.body.messages[0].role = role;
 		requestDetails.body.messages[0].history = ['000', '100', '200', '300', '400', '500']
 			.filter((key) => key < role)
-			.map((key) => JSON.stringify($createdItem['analysis_history'][key]));
-		requestDetails.body.messages[0].text = JSON.stringify($createdItem['analysis_history'][role][0]);
+			.map((key) => $createdItem['analysis_history'][key]);
+		requestDetails.body.messages[0].text = $createdItem['analysis_history'][role][0];
+		if ($referencesList) {
+			requestDetails.body.messages[0].sources = $referencesList;
+		}
 		console.log('request', requestDetails)
 		$isUpdating = role;
 		return requestDetails;

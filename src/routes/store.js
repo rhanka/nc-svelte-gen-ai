@@ -11,6 +11,8 @@ function createLocalStorageStore(key, initialValue, clean=false) {
   return store;
 }
 
+let myCreatedItem = null;
+
 let history = {
   '000': [],
   '100': [],
@@ -20,7 +22,20 @@ let history = {
   '500': []
 };
 
-function initialCreatedItem(history) {
+function initialCreatedItem() {
+  history = {
+    '000': [],
+    '100': [],
+    '200': [],
+    '300': [],
+    '400': [],
+    '500': []
+  };
+  if (myCreatedItem) {
+    ['000','100','200','300','400','500'].forEach(task => {
+      myCreatedItem.analysis_history[task] = history[task];
+    });
+  }
   return {
     currentTask: '000',
     ATA_code: "ATA-28",
@@ -43,19 +58,13 @@ function initialCreatedItem(history) {
 export function resetCreatedItem() {
   createdItem.set(
     initialCreatedItem(
-      {
-      '000': [],
-      '100': [],
-      '200': [],
-      '300': [],
-      '400': [],
-      '500': []
-      }
     )
   );
+  referencesList.set('');
 }
 // Crée un store pour stocker les donn�es des �v�nements
-export const createdItem = createLocalStorageStore('createdItem',initialCreatedItem(history) );
+export const createdItem = createLocalStorageStore('createdItem',initialCreatedItem() );
+export const referencesList = createLocalStorageStore('referencesList','' );
 export const updateCreatedItem = writable(null);
 export const taskLabel = {
     "000": "Non-Conformity Report",
@@ -68,3 +77,10 @@ export const taskLabel = {
 export const isUpdating = writable(false);
 export const askForHelp = writable(false);
 export const accessToken = createLocalStorageStore('accessToken', '');
+
+createdItem.subscribe(value => {
+  myCreatedItem = value;
+  ['000','100','200','300','400','500'].forEach(task => {
+    history[task] = myCreatedItem.analysis_history[task] || [];
+  });
+});

@@ -11,7 +11,7 @@
 	import PaneItem from './PaneItem.svelte';
 	import Tabs from './Tabs.svelte';
 	import { nonConformities } from './non_conformities.js';
-	import { askForHelp } from './store.js';
+	import { askForHelp, referencesList } from './store.js';
 
 	let maxRows=5000;
 	let apiUrl = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/nc?max_rows=${maxRows}`;
@@ -21,7 +21,6 @@
 	let doc_num = 0;
 	let selectedItem = null;
 	let selectedDoc = null;
-	let referencesList;
 	let documentsList= [];
 	let tabs = [];
 	let activeTabValue = 1;
@@ -103,9 +102,9 @@
 		$askForHelp = null;
 	}
 
-	$:	if (referencesList !== undefined) {
-			nonConformitiesFilter = referencesList["non_conformities"]["sources"];
-			documentsList = Object.values(referencesList["tech_docs"]["sources"]
+	$:	if ($referencesList) {
+			nonConformitiesFilter = $referencesList["non_conformities"]["sources"];
+			documentsList = Object.values($referencesList["tech_docs"]["sources"]
 				//.sort((a, b) => a.relevance_score - b.relevance_score)
 				.reduce((group, item) => {
 					// Si le groupe pour cet ID doc n'existe pas encore, on l'initialise
@@ -125,6 +124,9 @@
 				) // Initialisation d'un objet vide pour regrouper les items
 			) //.sort((a, b) => b.chunks[0].relevance_score - a.chunks[0].relevance_score);
 			console.log('doc',documentsList);
+		} else {
+			nonConformitiesFilter = [];
+			documentsList = [];
 		}
 
 	$:	doc_num = documentsList.length;
@@ -169,7 +171,7 @@
 				title="AI Agent"
 				num={undefined}
 			>
-				<Chatbot bind:referencesList={referencesList}>
+				<Chatbot>
 				</Chatbot>
 			</PaneItem>
 		</div>

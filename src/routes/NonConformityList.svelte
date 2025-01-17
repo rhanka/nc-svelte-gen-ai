@@ -1,5 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte';
+    import { referencesList } from './store.js';
 
     export let nonConformities = [];
 	export let num = 0;
@@ -51,7 +52,7 @@
 	    />
 	{:else}
 		<button
-			on:click={() => nonConformitiesFilter = []}
+			on:click={() => { nonConformitiesFilter = [];$referencesList = ''}}
 			style="width: 100%;padding: 0.3rem;background-color: #cecece; border: none; cursor: pointer;"
 		>
         	Clean AI Filter
