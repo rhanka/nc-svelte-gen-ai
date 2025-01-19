@@ -3,53 +3,140 @@
   	import { marked } from 'marked'; // Import the marked library
 	import { DeepChat } from "deep-chat";
 	let aiUrl = 'https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/ai';
-
+	export let stream = false;
+	let currentMsg = '';
+	let currentAction = '';
+	let nativeStream = true;
 	import { createdItem, updateCreatedItem, isUpdating, referencesList, askForHelp } from './store.js';
+
 	let chatElementRef;
+
+	$: console.log(`stream: ${stream}, nativeStream: ${nativeStream}`);
 
   const history = [
   ];
 
-	const responseInterceptor = async (response) => {
-    // Lire le Blob comme texte
-    const text = await response.text();
-		// Tenter de parser le texte en JSON
-    try {
-		const json = JSON.parse(text);
-		$referencesList = json.sources;
-		let role = $createdItem.currentTask;
-		console.log('response',json);
-		$isUpdating = false;
-		$updateCreatedItem = { role: role, label: json.label, description: json.description};
-		return {html: marked(json.text)}; // Retourner le JSON � DeepChat
-    } catch (e) {
-		console.error("Erreur lors du parsing du JSON:", e);
-		return { error: "Invalid JSON format" }; // Retourner une erreur si le JSON est invalide
-    }
-	};
-
-	const currentTask = () => {
-		console.log('history', $createdItem['analysis_history'])
-		if ($createdItem['analysis_history']['500'].length > 0) { return '500'}
-		if ($createdItem['analysis_history']['400'].length > 0) { return '400'}
-		if ($createdItem['analysis_history']['300'].length > 0) { return '300'}
-		if ($createdItem['analysis_history']['200'].length > 0) { return '200'}
-		if ($createdItem['analysis_history']['100'].length > 0) { return '100'}
-		return '000';
+	const actionInit = (data) => {
+		console.log("renderTool",data)
+		currentAction = data.text;
+		// chatElementRef.updateMessage({ html: `<div class="tool">${data.text} ...</div>`}, 0);
+		return { text: `*${data.text}...*\n`};
 	}
 
+	const actionStream = async (data) => {
+		//console.log("actionStream",data)
+		currentMsg += data.v;
+		console.log("actionStream",currentMsg)
+	}
+
+	const updateReferencesList = (data) => {
+		console.log("updateReferencesList",data)
+		const key = data.metadata == "nc_search" ? "non_conformities" : "tech_docs";
+		const otherKey = data.metadata == "nc_search" ? "tech_docs" : "non_conformities";
+		if ($referencesList) {
+			$referencesList = { [key]: data.text, [otherKey]: $referencesList[otherKey] };
+		} else {
+			$referencesList = { [key]: data.text, [otherKey]: { sources: []} };
+		}
+	}
+
+	const agentHeadTemplate = {
+		action: actionInit,
+		stream: actionStream
+	}
+
+	const agentHead = {
+		"nc_search": {
+			...agentHeadTemplate,
+			result: updateReferencesList
+		},
+		"doc_search": {
+			...agentHeadTemplate,
+			result: updateReferencesList
+		},
+		"query": {
+			...agentHeadTemplate,
+			result: () => {}
+		},
+		"000": {
+			...agentHeadTemplate,
+			result: (data) => {
+				const json = data.text;
+				$isUpdating = false;
+				$updateCreatedItem = { role: $createdItem.currentTask, label: json.label, description: json.description};
+				return { text: json.comment }
+			}
+		},
+		"final": {
+			result: () => {}
+		}
+	}
+
+	const eventProcess = (data) => {
+		if (data.v) {
+			return agentHead[data.metadata].stream(data)
+		} else {
+			return agentHead[data.metadata][data.type](data) || { v: '' }
+		}
+	}
+
+	const responseInterceptor = async (response) => {
+		console.log('responseInterceptor');
+		if (!stream) {
+			// Lire le Blob comme texte
+			const text = await response.text();
+				// Tenter de parser le texte en JSON
+			try {
+				const json = JSON.parse(text);
+				$referencesList = json.sources;
+				console.log('response',json);
+				$isUpdating = false;
+				$updateCreatedItem = { role: $createdItem.currentTask, label: json.label, description: json.description};
+				return {html: marked(json.text)}; // Retourner le JSON � DeepChat
+			} catch (e) {
+				console.error("Erreur lors du parsing du JSON:", e);
+				return { error: "Invalid JSON format" }; // Retourner une erreur si le JSON est invalide
+			}
+		} else if (stream && nativeStream) {
+			return eventProcess(response);
+		} else {
+			console.log('process response without custom Stream');
+			const reader = response.body.getReader();
+        	const decoder = new TextDecoder();
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+
+				const chunk = decoder.decode(value, { stream: true });
+				const lines = chunk.split("\n").filter(line => line.trim() !== "");
+
+				const messages= lines
+					.map((line) => {
+						if (line.startsWith("data: ")) {
+							try {
+								const data = JSON.parse(line.slice(6));
+							} catch {
+								return { v: '' }
+							}
+						}
+					});
+			}
+		}
+	};
+
 	const requestInterceptor = (requestDetails) => {
-		let role = currentTask();
-		requestDetails.body.messages[0].role = role;
+		requestDetails.body.messages[0].role = $createdItem.currentTask;
 		requestDetails.body.messages[0].history = ['000', '100', '200', '300', '400', '500']
-			.filter((key) => key < role)
+			.filter((key) => key < $createdItem.currentTask)
 			.map((key) => $createdItem['analysis_history'][key]);
-		requestDetails.body.messages[0].text = $createdItem['analysis_history'][role][0];
+		requestDetails.body.messages[0].text = $createdItem['analysis_history'][$createdItem.currentTask][0];
 		if ($referencesList) {
 			requestDetails.body.messages[0].sources = $referencesList;
 		}
-		console.log('request', requestDetails)
-		$isUpdating = role;
+		$isUpdating = $createdItem.currentTask;
+		currentMsg = '';
+		currentAction = '';
+		console.log('requestInterceptor',requestDetails);
 		return requestDetails;
 	};
 </script>
@@ -61,13 +148,13 @@
 			"ai": "https://upload.wikimedia.org/wikipedia/commons/e/ef/ChatGPT-Logo.svg"
 		}}
 		connect={{
+			stream: stream && nativeStream,
 			url: aiUrl,
 			method: "POST",
-				headers: {
-					'Content-Type': 'application/json',
-					'Accept': 'application/json',
-					'Origin': 'https://svelte.dev'
-				}
+			headers: (nativeStream && stream) ? {} : {
+				"Content-Type": "application/json",
+				"Accept": stream ? "text/event-stream" :"application/json"
+			}
 		}}
 		textInput={
 				{
@@ -127,7 +214,7 @@
 				events: {
 				click: (event) => {
 					const text = event.target.children[0].innerText;
-					chatElementRef.submitUserMessage(text);
+					chatElementRef.submitUserMessage({text: text});
 				},
 				},
 				styles: {
@@ -137,6 +224,7 @@
 				},
 			},
 			'custom-button-text': {styles: {default: {pointerEvents: 'none'}}},
+			'tool': {styles: {color: '#ccc'}},
 			}
 		}
   >

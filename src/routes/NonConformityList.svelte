@@ -20,22 +20,22 @@
 	}, {});
 
     // Filter items based on the search
-    $: if (!searchQuery && nonConformitiesFilter.length === 0) {
-	  filteredItems = nonConformities;
-	} else if (searchQuery && nonConformitiesFilter.length === 0) {
-		const query = searchQuery.toLowerCase();
-		filteredItems = nonConformities.filter(item => {
-			return (
-			item['nc_event_id'].toLowerCase().includes(query) ||
-			item['ATA_category'].toLowerCase().includes(query) ||
-			JSON.stringify(item['analysis_history']).toLowerCase().includes(query) // Added description to the search
-			);
-		});
-	} else {
-		filteredItems = nonConformities
+    // $: if (!searchQuery && nonConformitiesFilter.length === 0) {
+	//   filteredItems = nonConformities;
+	// } else if (searchQuery && nonConformitiesFilter.length === 0) {
+	// 	const query = searchQuery.toLowerCase();
+	// 	filteredItems = nonConformities.filter(item => {
+	// 		return (
+	// 		item['nc_event_id'].toLowerCase().includes(query) ||
+	// 		item['ATA_category'].toLowerCase().includes(query) ||
+	// 		JSON.stringify(item['analysis_history']).toLowerCase().includes(query) // Added description to the search
+	// 		);
+	// 	});
+	// } else {
+	$:	filteredItems = nonConformities
 			.filter(item => nonConformitiesFilter.some(n => n.doc === item['nc_event_id']))
 			.sort((a, b) => orderMap[a['nc_event_id']] - orderMap[b['nc_event_id']]);
-	}
+	// }
 
 	$: num = filteredItems.length;
 
@@ -44,12 +44,12 @@
 
   <div>
 	{#if nonConformitiesFilter.length === 0}
-	    <input
+	    <!-- <input
 	      id="search"
 	      type="text"
 	      bind:value={searchQuery}
 	      placeholder="Search by ID, category, or description"
-	    />
+	    /> -->
 	{:else}
 		<button
 			on:click={() => { nonConformitiesFilter = [];$referencesList = ''}}

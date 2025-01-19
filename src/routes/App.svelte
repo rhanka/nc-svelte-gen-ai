@@ -16,7 +16,7 @@
 	let maxRows=5000;
 	let apiUrl = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/nc?max_rows=${maxRows}`;
 	let nonConformitiesList = sortNC(nonConformities);
-	let nonConformitiesFilter;
+	let nonConformitiesFilter = [];
 	let nc_num = 0;
 	let doc_num = 0;
 	let selectedItem = null;
@@ -102,10 +102,16 @@
 		$askForHelp = null;
 	}
 
-	$:	if ($referencesList) {
-			nonConformitiesFilter = $referencesList["non_conformities"]["sources"];
-			documentsList = Object.values($referencesList["tech_docs"]["sources"]
-				//.sort((a, b) => a.relevance_score - b.relevance_score)
+	$:	if ($referencesList && $referencesList["non_conformities"]) {
+			nonConformitiesFilter = $referencesList["non_conformities"] && $referencesList["non_conformities"]["sources"] || [];
+			nc_num = nonConformitiesFilter.length;
+			console.log("non_conformities",nonConformitiesFilter);
+	} else {
+		nonConformitiesFilter = [];
+	}
+
+	$: 	if ($referencesList && $referencesList["tech_docs"]) {
+			documentsList = Object.values(Object.values($referencesList["tech_docs"] && $referencesList["tech_docs"]["sources"] || [])
 				.reduce((group, item) => {
 					// Si le groupe pour cet ID doc n'existe pas encore, on l'initialise
 					if (!group[item.doc]) {
@@ -121,11 +127,11 @@
 					});
 					return group;
 					}, {}
-				) // Initialisation d'un objet vide pour regrouper les items
-			) //.sort((a, b) => b.chunks[0].relevance_score - a.chunks[0].relevance_score);
-			console.log('doc',documentsList);
+				)); // Initialisation d'un objet vide pour regrouper les items
+			doc_num = documentsList.length
+			console.log(`tech_docs ${doc_num}`,documentsList);
 		} else {
-			nonConformitiesFilter = [];
+			console.log('tech_docs clean');
 			documentsList = [];
 		}
 
@@ -151,19 +157,21 @@
 					</DocumentsList>
 				</PaneItem>
 			{/if}
-			<PaneItem
-				expand={true}
-				title="Non Conformities List"
-				num={nc_num}
-			>
-				<NonConformityList
-					nonConformities={nonConformitiesList}
-					nonConformitiesFilter={nonConformitiesFilter}
-					bind:num={nc_num}
-					on:select={handleSelect}
+			{#if nc_num > 0}
+				<PaneItem
+					expand={true}
+					title="Non Conformities List"
+					num={nc_num}
 				>
-				</NonConformityList>
-			</PaneItem>
+					<NonConformityList
+						nonConformities={nonConformitiesList}
+						nonConformitiesFilter={nonConformitiesFilter}
+						bind:num={nc_num}
+						on:select={handleSelect}
+					>
+					</NonConformityList>
+				</PaneItem>
+			{/if}
 		</div>
 		<div style="position: absolute;bottom:0">
 			<PaneItem
@@ -171,7 +179,7 @@
 				title="AI Agent"
 				num={undefined}
 			>
-				<Chatbot>
+				<Chatbot stream={true}>
 				</Chatbot>
 			</PaneItem>
 		</div>
