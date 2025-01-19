@@ -4,8 +4,7 @@
 	import { DeepChat } from "deep-chat";
 	let aiUrl = 'https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/ai';
 	export let stream = false;
-	let currentMsg = '';
-	let currentAction = '';
+	let currentMsg = {};
 	let nativeStream = true;
 	import { createdItem, updateCreatedItem, isUpdating, referencesList, askForHelp } from './store.js';
 
@@ -16,20 +15,71 @@
   const history = [
   ];
 
+	// Fonction naïve qui ferme guillemets, crochets et accolades restants
+	const completeJSON = (str) => {
+		let openCurly = 0, openSquare = 0;
+		let inString = false, escaped = false;
+
+		for (let i = 0; i < str.length; i++) {
+		const c = str[i];
+		if (c === '"' && !escaped) inString = !inString;
+		escaped = (!escaped && c === '\\');
+		if (!inString) {
+			if (c === '{') openCurly++;
+			else if (c === '}') openCurly--;
+			else if (c === '[') openSquare++;
+			else if (c === ']') openSquare--;
+		}
+    }
+
+    let fixed = str;
+    if (inString) fixed += '"';
+    while (openSquare > 0) { fixed += ']'; openSquare--; }
+    while (openCurly > 0) { fixed += '}'; openCurly--; }
+    return fixed;
+	}
+
+	const parsePartialJSON = (chunk) => {
+		// On concatène le nouveau bout et on tente une fermeture
+		const buffer = chunk;
+		const attempt = completeJSON(buffer);
+		try {
+			const parsed = JSON.parse(attempt);
+			return parsed;
+		} catch {
+			return null;
+		}
+	}
+
 	const actionInit = (data) => {
-		console.log("renderTool",data)
-		currentAction = data.text;
+		console.log("actionInit",data)
+		currentMsg[data.metatada] = '';
 		// chatElementRef.updateMessage({ html: `<div class="tool">${data.text} ...</div>`}, 0);
 		return { text: `*${data.text}...*\n`};
 	}
 
-	const actionStream = async (data) => {
-		//console.log("actionStream",data)
-		currentMsg += data.v;
-		console.log("actionStream",currentMsg)
+	const actionStream = (data) => {
+		currentMsg[data.metadata] += data.v;
+	}
+
+	const actionCanevasStream = (data) => {
+		if (!currentMsg[data.metadata]) {
+			currentMsg[data.metadata] = { v: '', jsonString : ''};
+		}
+		currentMsg[data.metadata].jsonString += data.v;
+		const json = parsePartialJSON(currentMsg[data.metadata].jsonString);
+		if (json) {
+			$updateCreatedItem = { role: $createdItem.currentTask, label: json.label , description: json.description};
+			if (json.comment) {
+				const output = { 'v': json.comment.slice(currentMsg[data.metadata].v.length), metadata: data.metadata }
+				currentMsg[data.metadata].v = json.comment;
+				return output;
+			}
+		}
 	}
 
 	const updateReferencesList = (data) => {
+		currentMsg[data.metadata] = '';
 		console.log("updateReferencesList",data)
 		const key = data.metadata == "nc_search" ? "non_conformities" : "tech_docs";
 		const otherKey = data.metadata == "nc_search" ? "tech_docs" : "non_conformities";
@@ -59,7 +109,8 @@
 			result: () => {}
 		},
 		"000": {
-			...agentHeadTemplate,
+			action: actionInit,
+			stream: actionCanevasStream,
 			result: (data) => {
 				const json = data.text;
 				$isUpdating = false;
@@ -134,8 +185,6 @@
 			requestDetails.body.messages[0].sources = $referencesList;
 		}
 		$isUpdating = $createdItem.currentTask;
-		currentMsg = '';
-		currentAction = '';
 		console.log('requestInterceptor',requestDetails);
 		return requestDetails;
 	};
