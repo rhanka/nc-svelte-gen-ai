@@ -3,19 +3,12 @@
 
     export let selectedItem;
 
-    // Directive to inject HTML
-    function html(node, htmlContent) {
-      node.innerHTML = htmlContent;
-
-      return {
-        update(newHtml) {
-          node.innerHTML = newHtml;
-        }
-      };
-    }
   </script>
 
-    <div style="padding-left: 16px;padding-right: 8px; background-color: #f9f9f9;">
+    <div
+      class="non-conformity-detail"
+      style="padding-left: 16px;padding-right: 8px; background-color: #f9f9f9;"
+    >
 			<button
           type="button"
           style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;">
@@ -31,7 +24,8 @@
           <NonConformityTask
             expand={['000','500'].includes(task)}
             task={task}
-            history={selectedItem['analysis_history']['000']}
+            history={selectedItem['analysis_history'][task]}
+            highlights={selectedItem.highlights}
           >
           </NonConformityTask>
         {/each}
@@ -40,5 +34,9 @@
   <style>
     li:hover {
       background-color: #f0f0f0;
+    }
+    mark {
+      background-color: yellow;
+      font-weight: bold;
     }
   </style>

@@ -34,6 +34,12 @@
 	// } else {
 	$:	filteredItems = nonConformities
 			.filter(item => nonConformitiesFilter.some(n => n.doc === item['nc_event_id']))
+			.map(item => {
+				item.highlights = nonConformitiesFilter
+					.filter(n => n.doc === item['nc_event_id'])
+					.map(n => n.content);
+				return item;
+			})
 			.sort((a, b) => orderMap[a['nc_event_id']] - orderMap[b['nc_event_id']]);
 	// }
 
@@ -52,7 +58,7 @@
 	    /> -->
 	{:else}
 		<button
-			on:click={() => { nonConformitiesFilter = [];$referencesList = ''}}
+			on:click={() => { nonConformitiesFilter = []; $referencesList = ''}}
 			style="width: 100%;padding: 0.3rem;background-color: #cecece; border: none; cursor: pointer;"
 		>
         	Clean AI Filter

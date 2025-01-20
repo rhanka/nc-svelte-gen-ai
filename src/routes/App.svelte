@@ -26,8 +26,6 @@
 	let activeTabValue = 1;
 	let showChatbot = false;
 
-	$:	console.log('showChatbot',showChatbot);
-
 	function sortNC(list) {
 		return list.sort(
 			(a, b) => new Date(b['nc_event_date']) - new Date(a['nc_event_date'])
@@ -37,12 +35,10 @@
 	function handleSelect(event) {
 		selectedItem = event.detail.item;
 		activeTabValue = 2;
-		console.log(selectedItem);
 	}
 
 	function handleDocumentSelect(event) {
 		selectedDoc = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/doc/${encodeURIComponent(event.detail.doc.doc.replace(/\.md/, '.pdf'))}`;		activeTabValue = 3;
-		console.log('app to pdf',selectedDoc);
 	}
 
 	async function getData () {
@@ -105,7 +101,6 @@
 	$:	if ($referencesList && $referencesList["non_conformities"]) {
 			nonConformitiesFilter = $referencesList["non_conformities"] && $referencesList["non_conformities"]["sources"] || [];
 			nc_num = nonConformitiesFilter.length;
-			console.log("non_conformities",nonConformitiesFilter);
 	} else {
 		nonConformitiesFilter = [];
 	}
