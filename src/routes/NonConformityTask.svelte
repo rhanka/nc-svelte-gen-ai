@@ -43,7 +43,6 @@
 
 	$: if (highlightContainer.length > 0) {
 		history.forEach((step,index) => {
-		console.log(step,index);
 			highlightContainer[index].innerHTML = marked(step.description.replace(/###/g,'####'))
 			applyHighlights(highlightContainer[index], highlights);
 		});

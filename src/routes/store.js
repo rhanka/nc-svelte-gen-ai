@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import { nonConformities } from './non_conformities';
 
 function createLocalStorageStore(key, initialValue, clean=false) {
   const storedValue = clean ? null : localStorage.getItem(key);
@@ -77,6 +78,8 @@ export const taskLabel = {
 export const isUpdating = writable(false);
 export const askForHelp = writable(false);
 export const accessToken = createLocalStorageStore('accessToken', '');
+
+export const filteredNonConformities = writable([]);
 
 createdItem.subscribe(value => {
   myCreatedItem = value;

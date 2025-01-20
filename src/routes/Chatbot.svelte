@@ -2,6 +2,7 @@
 <script>
   	import { marked } from 'marked'; // Import the marked library
 	import { DeepChat } from "deep-chat";
+	import { filteredNonConformities } from './store.js';
 	let aiUrl = 'https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/ai';
 	export let stream = false;
 	let currentMsg = {};
@@ -91,7 +92,12 @@
 	}
 
 	const updateTask = (data) => {
-		const json = data.text;
+		let json;
+		try {
+			json = JSON.parse(data.text);
+		} catch {
+			json = data.text;
+		}
 		$isUpdating = false;
 		$updateCreatedItem = { role: $createdItem.currentTask, label: json.label, description: json.description};
 		return { text: json.comment }
@@ -193,9 +199,13 @@
 		requestDetails.body.messages[0].history = ['000', '100', '200', '300', '400', '500']
 			.filter((key) => key < $createdItem.currentTask)
 			.map((key) => $createdItem['analysis_history'][key]);
-		requestDetails.body.messages[0].text = $createdItem['analysis_history'][$createdItem.currentTask][0];
+		// user_message is implicitely set to inherited requestDetails.body.messages[0].text
+		requestDetails.body.messages[0].description = $createdItem['analysis_history'][$createdItem.currentTask][0];
 		if ($referencesList) {
 			requestDetails.body.messages[0].sources = $referencesList;
+			requestDetails.body.messages[0].sources["non_conformities"].sources = $filteredNonConformities.map((item) => {
+				return { doc: item['nc_event_id'], ATA_code: item['ATA_code'], ATA_category: item['ATA_category'], label: item['analysis_history']['000'][0]['label'], content: item['analysis_history'][$createdItem.currentTask] };
+			});
 		}
 		$isUpdating = $createdItem.currentTask;
 		console.log('requestInterceptor',requestDetails);

@@ -1,12 +1,11 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { referencesList } from './store.js';
+    import { referencesList, filteredNonConformities } from './store.js';
 
     export let nonConformities = [];
 	export let num = 0;
 	export let nonConformitiesFilter = [];
 
-	let filteredItems = [];
     const dispatch = createEventDispatcher();
     let searchQuery = '';
 
@@ -19,20 +18,7 @@
 		return acc;
 	}, {});
 
-    // Filter items based on the search
-    // $: if (!searchQuery && nonConformitiesFilter.length === 0) {
-	//   filteredItems = nonConformities;
-	// } else if (searchQuery && nonConformitiesFilter.length === 0) {
-	// 	const query = searchQuery.toLowerCase();
-	// 	filteredItems = nonConformities.filter(item => {
-	// 		return (
-	// 		item['nc_event_id'].toLowerCase().includes(query) ||
-	// 		item['ATA_category'].toLowerCase().includes(query) ||
-	// 		JSON.stringify(item['analysis_history']).toLowerCase().includes(query) // Added description to the search
-	// 		);
-	// 	});
-	// } else {
-	$:	filteredItems = nonConformities
+	$:	$filteredNonConformities = nonConformities
 			.filter(item => nonConformitiesFilter.some(n => n.doc === item['nc_event_id']))
 			.map(item => {
 				item.highlights = nonConformitiesFilter
@@ -43,7 +29,7 @@
 			.sort((a, b) => orderMap[a['nc_event_id']] - orderMap[b['nc_event_id']]);
 	// }
 
-	$: num = filteredItems.length;
+	$: num = $filteredNonConformities.length;
 
 	$: console.log(nonConformitiesFilter)
   </script>
@@ -67,7 +53,7 @@
   </div>
   <div class="scrollable">
 	<ul style="list-style-type: none; padding: 0;">
-			{#each filteredItems as item, index}
+			{#each $filteredNonConformities as item, index}
 		<li style="padding: 0; border-bottom: 1px solid #ccc; list-style-type: none;">
 			<button
 			type="button"
