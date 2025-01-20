@@ -134,8 +134,13 @@
 	const eventProcess = (data) => {
 		if (data.v) {
 			return agentHead[data.metadata].stream(data)
-		} else {
-			return agentHead[data.metadata][data.type](data) || { v: '' }
+		} else if (data !== "v1") {
+			try {
+				return agentHead[data.metadata][data.type](data) || { v: '' };
+			} catch {
+				console.log("Error in eventProcess", data);
+				return { v: '' }
+			}
 		}
 	}
 
