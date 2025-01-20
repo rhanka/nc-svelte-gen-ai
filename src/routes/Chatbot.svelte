@@ -90,12 +90,29 @@
 		}
 	}
 
+	const updateTask = (data) => {
+		const json = data.text;
+		$isUpdating = false;
+		$updateCreatedItem = { role: $createdItem.currentTask, label: json.label, description: json.description};
+		return { text: json.comment }
+	}
+
 	const agentHeadTemplate = {
 		action: actionInit,
 		stream: actionStream
 	}
 
+	const canevasAgentTemplate = {
+		action: actionInit,
+		stream: actionCanevasStream,
+		result: updateTask
+	}
+
 	const agentHead = {
+		"query": {
+			...agentHeadTemplate,
+			result: () => {}
+		},
 		"nc_search": {
 			...agentHeadTemplate,
 			result: updateReferencesList
@@ -104,20 +121,11 @@
 			...agentHeadTemplate,
 			result: updateReferencesList
 		},
-		"query": {
-			...agentHeadTemplate,
-			result: () => {}
-		},
-		"000": {
-			action: actionInit,
-			stream: actionCanevasStream,
-			result: (data) => {
-				const json = data.text;
-				$isUpdating = false;
-				$updateCreatedItem = { role: $createdItem.currentTask, label: json.label, description: json.description};
-				return { text: json.comment }
-			}
-		},
+		"000": canevasAgentTemplate,
+		"100": canevasAgentTemplate,
+		"200": canevasAgentTemplate,
+		"300": canevasAgentTemplate,
+		"400": canevasAgentTemplate,
 		"final": {
 			result: () => {}
 		}
