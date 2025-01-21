@@ -7,14 +7,12 @@
 	export let stream = false;
 	let currentMsg = {};
 	let nativeStream = true;
-	import { createdItem, updateCreatedItem, isUpdating, referencesList, askForHelp } from './store.js';
+	import { createdItem, updateCreatedItem, isUpdating, referencesList, chatElementRef, defaultAction } from './store.js';
 
-	let chatElementRef;
+	$: console.log(`Chatbot stream mode: ${stream}; use nativeStream: ${stream && nativeStream}`);
 
-	$: console.log(`stream: ${stream}, nativeStream: ${nativeStream}`);
-
-  const history = [
-  ];
+	const history = [
+	];
 
 	// Fonction naïve qui ferme guillemets, crochets et accolades restants
 	const completeJSON = (str) => {
@@ -55,7 +53,7 @@
 	const actionInit = (data) => {
 		console.log("actionInit",data)
 		currentMsg[data.metatada] = '';
-		// chatElementRef.updateMessage({ html: `<div class="tool">${data.text} ...</div>`}, 0);
+		// $chatElementRef.updateMessage({ html: `<div class="tool">${data.text} ...</div>`}, 0);
 		return { text: `*${data.text}...*\n`};
 	}
 
@@ -151,7 +149,6 @@
 	}
 
 	const responseInterceptor = async (response) => {
-		console.log('responseInterceptor');
 		if (!stream) {
 			// Lire le Blob comme texte
 			const text = await response.text();
@@ -200,6 +197,7 @@
 			.filter((key) => key < $createdItem.currentTask)
 			.map((key) => $createdItem['analysis_history'][key]);
 		// user_message is implicitely set to inherited requestDetails.body.messages[0].text
+		console.log('ici', $createdItem, $createdItem.currentTask);
 		requestDetails.body.messages[0].description = $createdItem['analysis_history'][$createdItem.currentTask][0];
 		if ($referencesList) {
 			requestDetails.body.messages[0].sources = $referencesList;
@@ -208,14 +206,13 @@
 			});
 		}
 		$isUpdating = $createdItem.currentTask;
-		console.log('requestInterceptor',requestDetails);
 		return requestDetails;
 	};
 </script>
 
 <main style="margin: 0px;">
   <deep-chat
-		bind:this={chatElementRef}
+		bind:this={$chatElementRef}
 		avatars={{
 			"ai": "https://upload.wikimedia.org/wikipedia/commons/e/ef/ChatGPT-Logo.svg"
 		}}
@@ -286,7 +283,7 @@
 				events: {
 				click: (event) => {
 					const text = event.target.children[0].innerText;
-					chatElementRef.submitUserMessage({text: text});
+					$chatElementRef.submitUserMessage({text: text});
 				},
 				},
 				styles: {
@@ -302,7 +299,7 @@
   >
     <div style="display: none">
     <div class="custom-button">
-      <div class="custom-button-text">Propose task description</div>
+      <div class="custom-button-text">{$defaultAction}</div>
     </div>
     <div class="custom-button" style="margin-top: 15px">
       <div class="custom-button-text">Translate to french</div>

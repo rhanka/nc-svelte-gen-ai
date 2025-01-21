@@ -62,6 +62,11 @@ export function resetCreatedItem() {
     )
   );
   referencesList.set('');
+  try {
+    myChatElementRef.clearMessages();
+  } catch {
+    console.log
+  }
 }
 // Crée un store pour stocker les donn�es des �v�nements
 export const createdItem = createLocalStorageStore('createdItem',initialCreatedItem() );
@@ -81,9 +86,18 @@ export const accessToken = createLocalStorageStore('accessToken', '');
 
 export const filteredNonConformities = writable([]);
 
+export const chatElementRef = writable(null);
+let myChatElementRef;
+
+export const defaultAction = writable("Propose task description");
+
 createdItem.subscribe(value => {
   myCreatedItem = value;
   ['000','100','200','300','400','500'].forEach(task => {
     history[task] = myCreatedItem.analysis_history[task] || [];
   });
+});
+
+chatElementRef.subscribe(value => {
+  myChatElementRef = value;
 });
