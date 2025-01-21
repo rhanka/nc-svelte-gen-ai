@@ -12,7 +12,7 @@
 	export let dropzone = false;
 
 	const dict = {
-    	aircraft_id: "Aircraft Serial Number",
+		aircraft_id: "Aircraft Serial Number",
 		part_id: "Part number",
 		nc_event_date: "Date"
 	}
@@ -79,13 +79,15 @@
 
 </script>
 
+
 <div style="padding: 0; border-bottom: 1px solid #eee; margin-top:-2px; list-style-type: none;">
 	{#if task}
 		<button
-          type="button"
-          on:click={handleClick}
-          on:keypress={(e) => e.key === 'Enter' && handleClick()}
-          style="cursor: pointer; padding: 0px; width: 100%; text-align: left; border: none; background: #eee;">
+			type="button"
+			on:click={handleClick}
+			on:keypress={(e) => e.key === 'Enter' && handleClick()}
+			style="cursor: pointer; padding: 0px; width: 100%; text-align: left; border: none; background: #eee;"
+		>
 			<h3>
 				<span style="padding: 0 8px;">{expand ? '-' : '+'}</span>
 				{taskLabel[task]}
@@ -93,7 +95,7 @@
 					<a
 						href="/"
 						on:click|stopPropagation|preventDefault={() => $askForHelp=task}
-          				on:keypress={(e) => {if (e.key === 'Enter') {$askForHelp = task}}}
+						on:keypress={(e) => {if (e.key === 'Enter') {$askForHelp = task}}}
 						style="margin-left:.25rem;cursor: help; text-decoration:none; padding: 0px; width: 100%; text-align: left; border: none; background: transparent;"
 					>
 						<i style="font-size: 1rem;" class="fas fa-wand-magic"></i> <!-- Logout icon -->
