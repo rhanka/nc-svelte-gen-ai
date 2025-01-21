@@ -107,78 +107,141 @@
 
 	{#if expand}
 		<div class="container">
-		<div class="left-column {$isUpdating === task ? 'gradiant' : ''}">
-			{#if $createdItem.analysis_history[task] && $createdItem.analysis_history[task].length}
-				{#each $createdItem.analysis_history[task] as step}
-					<li style="padding: 8px; border-bottom: 1px solid #eee;">
-						<h4><Input bind:value={step.label} label="Label"/> - <Input bind:value={step.date} label="Date"/> </h4>
+			<div class="left-column {$isUpdating === task ? 'gradiant' : ''}">
+				{#if $createdItem.analysis_history[task] && $createdItem.analysis_history[task].length}
+					{#each $createdItem.analysis_history[task] as step}
+						<li style="padding: 8px; border-bottom: 1px solid #eee;">
+							<h4><Input bind:value={step.label} label="Label"/> - <Input bind:value={step.date} label="Date"/> </h4>
 
-						<Input label="Role" bind:value={step['role']}/> -
-						<Input label="Author" bind:value={step['name']}/>
+							<Input label="Role" bind:value={step['role']}/> -
+							<Input label="Author" bind:value={step['name']}/>
 
-						<br><br>
-						<div>
-							{#if typeof step.description === 'string'}
-								<Input
-									bind:value={step.description}
-									label="Description"
-									markdown={true}
-								/>
-							{:else if typeof step.description === 'object'}
-								{#each Object.entries(step.description) as [key, value]}
-									{#if Array.isArray(value)}
-										<Input
-										value={JSON.stringify(step.description[key])}
-										label={key}
+							<br><br>
+							<div>
+								{#if typeof step.description === 'string'}
+									<Input
+										bind:value={step.description}
+										label="Description"
 										markdown={true}
-										/>
-									{:else if typeof step.description[key] === 'string'}
-										<h4>{smartLabel(key)}</h4>
-										<Input
-										bind:value={step.description[key]}
-										markdown={true}
-										/>
-									{:else if typeof step.description === 'object'}
-										<h4>{smartLabel(key)}</h4>
-										<ul style="margin-top:0;padding-top:0;padding-bottom:0">
-										{#each Object.entries(step.description[key]) as [key2, value2]}
-											<li style="padding:0"><strong>{smartLabel(key2)}: &nbsp</strong><Input
-											bind:value={step.description[key][key2]}
-											/>
-											</li>
-										{/each}
-										</ul>
-									{/if}
-								{/each}
-							{/if}
-						</div>
-					</li>
-				{/each}
-			{/if}
-		</div>
-		<div class="right-column">
-			{#if dropzone}
-					{#if files.accepted.length > 0}
-						<div class="image-preview">
-							{#each files.accepted as file, index}
-								<div class="img-container">
-									<img
-										src={URL.createObjectURL(file)}
-										alt={`Preview of ${file.name}`}
-										class="preview-img"
 									/>
-									<br>
-									<button on:click={() => handleRemoveFile(null, index)}>Remove</button>
-								</div>
-							{/each}
-						</div>
-					{:else}
-						<Dropzone on:drop={handleFilesSelect} accept={["image/*"]}>
-						Drag 'n' drop some image here, or click to select files
-						</Dropzone>
-					{/if}
+								{:else if typeof step.description === 'object'}
+									{#each Object.entries(step.description) as [key, value]}
+										{#if Array.isArray(value)}
+											<Input
+											value={JSON.stringify(step.description[key])}
+											label={key}
+											markdown={true}
+											/>
+										{:else if typeof step.description[key] === 'string'}
+											<h4>{smartLabel(key)}</h4>
+											<Input
+											bind:value={step.description[key]}
+											markdown={true}
+											/>
+										{:else if typeof step.description === 'object'}
+											<h4>{smartLabel(key)}</h4>
+											<ul style="margin-top:0;padding-top:0;padding-bottom:0">
+											{#each Object.entries(step.description[key]) as [key2, value2]}
+												<li style="padding:0"><strong>{smartLabel(key2)}: &nbsp</strong><Input
+												bind:value={step.description[key][key2]}
+												/>
+												</li>
+											{/each}
+											</ul>
+										{/if}
+									{/each}
+								{/if}
+							</div>
+						</li>
+					{/each}
 				{/if}
-		</div>
+			</div>
+			<div class="right-column">
+				{#if dropzone}
+						{#if files.accepted.length > 0}
+							<div class="image-preview">
+								{#each files.accepted as file, index}
+									<div class="img-container">
+										<img
+											src={URL.createObjectURL(file)}
+											alt={`Preview of ${file.name}`}
+											class="preview-img"
+										/>
+										<br>
+										<button on:click={() => handleRemoveFile(null, index)}>Remove</button>
+									</div>
+								{/each}
+							</div>
+						{:else}
+							<Dropzone on:drop={handleFilesSelect} accept={["image/*"]}>
+							Drag 'n' drop some image here, or click to select files
+							</Dropzone>
+						{/if}
+					{/if}
+			</div>
+			<div class="icon-bar-wrapper">
+				<div class="icon-bar">
+					<button
+						on:click={() => $createdItem.analysis_history[task][0].validated = !$createdItem.analysis_history[task][0].validated}
+						aria-label="Validate"
+					>
+						<i class="fas fa-check" style="color: {$createdItem.analysis_history[task][0].validated ? 'green;' : '#bbb'}" title="Valider"></i>
+					</button>
+					<button
+						on:click={() => {
+							$createdItem.analysis_history[task][0].redo = $createdItem.analysis_history[task][0]
+							$createdItem.analysis_history[task][0] = $createdItem.analysis_history[task][0].undo
+						}}
+						aria-label="Undo"
+					>
+						<i class="fas fa-undo" title="Undo"></i>
+					</button>
+					<button
+						on:click={() => {
+							if ($createdItem.analysis_history[task][0].redo) {
+								$createdItem.analysis_history[task][0].undo = $createdItem.analysis_history[task][0]
+								$createdItem.analysis_history[task][0] = $createdItem.analysis_history[task][0].redo
+							} else {
+								$askForHelp = task
+							}
+						}}
+						aria-label="{$createdItem.analysis_history[task][0].redo ? 'Redo' : 'Retry'}"
+					>
+						<i class="fas fa-redo" title="{$createdItem.analysis_history[task][0].redo ? 'Redo' : 'Retry'}"></i>
+					</button>
+					<button
+						on:click={() => {
+							if ($createdItem.analysis_history[task][0].feedback === "positive") {
+								$createdItem.analysis_history[task][0].feedback = null
+							} else {
+								$createdItem.analysis_history[task][0].feedback = "positive"
+							}
+						}}
+						aria-label="Helpful"
+					>
+						<i
+							class="fa{$createdItem.analysis_history[task][0].feedback === 'positive' ? 's' : 'r'} fa-thumbs-up"
+							style="color: {$createdItem.analysis_history[task][0].feedback === "positive" ? 'black' : '#aaa'}"
+							title="Helpful"
+						></i>
+					</button>
+					<button
+						on:click={() => {
+							if ($createdItem.analysis_history[task][0].feedback === "negative") {
+								$createdItem.analysis_history[task][0].feedback = null
+							} else {
+								$createdItem.analysis_history[task][0].feedback = "negative"
+							}
+						}}
+						aria-label="Not Helpful, Useless or Harmful"
+					>
+						<i
+							class="fa{$createdItem.analysis_history[task][0].feedback === 'negative' ? 's' : 'r'} fa-thumbs-down"
+							style="color: {$createdItem.analysis_history[task][0].feedback === "negative" ? 'black' : '#aaa'}"
+							title="Not Helpful, Useless or Harmful"></i>
+					</button>
+				</div>
+			</div>
 		</div>
 	{/if}
 
@@ -187,7 +250,7 @@
 <style>
   li {
     padding: 1rem;
-	  transition: width 0.3s;
+	transition: width 0.3s;
   }
 
   /* Conteneur global */
@@ -199,14 +262,14 @@
 
   /* Colonne de gauche */
   .left-column {
-		padding-right: 0.5rem;
+	padding-right: 0.5rem;
     flex: 2; /* 2/3 de l'espace disponible */
     min-width: 200px; /* Largeur minimale pour �viter un �crasement trop important */
   }
 
   /* Colonne de droite */
   .right-column {
-		padding-top: 2rem;
+	padding-top: 2rem;
     flex: 1; /* 1/3 de l'espace disponible */
     min-width: 200px; /* Largeur minimale pour �viter un �crasement trop important */
   }
@@ -281,6 +344,41 @@
 		-webkit-text-fill-color: transparent;
 		animation: gradient 1.5s infinite linear;
 	}
+
+  .icon-bar-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    width: 100%;
+  }
+
+  .icon-bar {
+    display: flex;
+	justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    border-top: 1px solid #eee;
+  }
+
+  .icon-bar button {
+	cursor: pointer;
+	border: none;
+	background: none;
+	margin: 0;
+  }
+  .icon-bar i {
+    font-size: 1rem;
+    cursor: pointer;
+    color: #bbb;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .icon-bar i:hover {
+    color: black;
+    transform: scale(1.1);
+  }
 
 </style>
 
