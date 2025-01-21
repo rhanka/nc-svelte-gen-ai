@@ -34,6 +34,7 @@
     if (textarea) {
       textarea.focus(); // Focus sur le textarea
       textarea.style.height = "auto"; // R�initialise la hauteur
+      let height = Math.max(textarea.scrollHeight, 12); // Stocke la hauteur minimale
       textarea.style.height = `${textarea.scrollHeight}px`; // D�finit la hauteur bas�e sur le contenu
     }
   };
