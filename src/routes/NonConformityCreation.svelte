@@ -7,6 +7,7 @@
     import { on } from 'svelte/events';
     import '@fortawesome/fontawesome-free/css/all.css';
 
+	let taskMask = null;
 
 	$: if ($updateCreatedItem) {
 		$createdItem.analysis_history[$updateCreatedItem.role][0].label = $updateCreatedItem.label;
@@ -16,6 +17,15 @@
 
 	$: if ($createdItem && $createdItem.analysis_history) {
 		$createdItem = $createdItem
+		taskMask = Object.keys(($createdItem.analysis_history))
+			.sort((a, b) => a - b)[
+			Object.keys($createdItem.analysis_history)
+			.sort((a, b) => a - b)
+			.filter((task) =>
+				($createdItem.analysis_history[task].length > 0) &&
+				$createdItem.analysis_history[task][0].validated
+			).length
+		];
 	}
 
     // Directive to inject HTML
@@ -49,7 +59,7 @@
 		<Input label="Role" bind:value={$createdItem['role']}/> -
 		<Input label="Author" bind:value={$createdItem['name']}/>
 		<h3>Tasks:</h3>
-		{#each ['000', '100', '200', '300', '400', '500'] as task}
+		{#each ['000', '100', '200', '300', '400', '500'].filter(t => t <= taskMask) as task}
 			<NonConformityTaskCreation
 				dropzone={task === '000'}
 				expand={task === '000'}
