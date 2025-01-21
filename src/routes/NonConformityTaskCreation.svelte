@@ -23,16 +23,31 @@
 
 	let image;
 
-	let step_template = {
-		label: "<Please provide a short label for non-conformity>",
-		description:"Please provide a concise and precise description for this task",
-		name: "Eric Roy",
-		role: "Quality Controller",
-		date: (new Date()).toISOString()
-	};
+	const step_template = {
+		'000': {
+			label: "<Please provide a short label for non-conformity report>",
+			description: "Please provide a concise and precise description for this task",
+			name: "Eric Roy",
+			role: "Quality Controller",
+			date: (new Date()).toISOString(),
+			previous: null,
+			next: null,
+			validated: false
+		},
+		'100': {
+			label: "<Please provide a short label for non-conformity analysis>",
+			description: "Please provide a concise and precise description for this task",
+			name: "Christine Tremblay",
+			role: "Design Office",
+			date: (new Date()).toISOString(),
+			previous: null,
+			next: null,
+			validated: false
+		}
+	}
 
 	$: if (expand && $createdItem.analysis_history[task].length === 0) {
-		$createdItem.analysis_history[task][0] = {...step_template};
+		$createdItem.analysis_history[task][0] = {...step_template[task]};
 	}
 
   let files = {
