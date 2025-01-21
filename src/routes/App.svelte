@@ -11,7 +11,7 @@
 	import PaneItem from './PaneItem.svelte';
 	import Tabs from './Tabs.svelte';
 	import { nonConformities } from './non_conformities.js';
-	import { askForHelp, referencesList } from './store.js';
+	import { askForHelp, referencesList, chatElementRef, defaultAction, createdItem } from './store.js';
 
 	let maxRows=5000;
 	let apiUrl = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/nc?max_rows=${maxRows}`;
@@ -95,7 +95,12 @@
 
 	$: if ($askForHelp) {
 		showChatbot = true;
-		$askForHelp = null;
+		let role =  $askForHelp;
+		$askForHelp = false;
+		$createdItem.currentTask = role;
+		setTimeout(() => {
+			$chatElementRef.submitUserMessage({text: $defaultAction, role: role });
+		}, 100)
 	}
 
 	$:	if ($referencesList && $referencesList["non_conformities"]) {
