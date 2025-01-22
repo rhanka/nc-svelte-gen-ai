@@ -178,7 +178,7 @@
 			<div class="MuiList-root MuiList-padding" style="position: absolute;bottom:60px">
 				<PaneItem
 					bind:expand={showChatbot}
-					title="AI Agent"
+					title="AI Assistant"
 					num={undefined}
 					inverted={true}
 				>
