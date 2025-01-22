@@ -12,6 +12,6 @@ body {
     background-color: rgb(255, 255, 255);
 }
 
-strong {
+strong, input, h1, h2, h3, h4, button {
 	font-family: Source Sans Pro, sans-serif;
 }

@@ -2,6 +2,8 @@
     import { createEventDispatcher } from 'svelte';
     import { marked } from 'marked'; // Import the marked library
     import { referencesList, selectDoc, selectItem, activeTabValue } from './store';
+    import "svelte-ripple-action/ripple.css"
+	  import { ripple } from "svelte-ripple-action";
 
     export let documentsList = [];
     const dispatch = createEventDispatcher();
@@ -28,6 +30,7 @@
         <li class:selected={$selectDoc === doc && $activeTabValue === 3}>
           <button
             type="button"
+            use:ripple={{color: "rgba(82, 54, 171, 0.2)", duration: 0.6}}
             on:click={() => {$selectDoc = doc}}
             on:keypress={(e) => { if (e.key === 'Enter') { $selectDoc = doc } }}
             style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;">

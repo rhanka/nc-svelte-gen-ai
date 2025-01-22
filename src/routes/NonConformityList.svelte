@@ -1,6 +1,8 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { referencesList, filteredNonConformities, activeTabValue, selectItem } from './store.js';
+	import "svelte-ripple-action/ripple.css"
+	import { ripple } from "svelte-ripple-action";
 
     export let nonConformities = [];
 	export let num = 0;
@@ -32,12 +34,12 @@
 
   <div style="position:relative;">
 	{#if nonConformitiesFilter.length > 0}
-		<div style="align:right;padding-right:0.5rem;position:absolute;top:0;right:0;">
+		<div style="align:right;padding-right:0.5rem;position:absolute;top:2px;right:2px;">
 			<button
 				style="cursor:pointer;align:right;border:none;background:none;"
 				on:click={() => { nonConformitiesFilter = []; $referencesList = ''}}
 			>
-				<i style="font-size: 1rem;" class="fas fa-trash-alt"></i> <!-- Logout icon -->
+				<i style="font-size: 0.75rem;" class="fas fa-trash-alt"></i> 
 			</button>
 		</div>
 	{/if}
@@ -48,6 +50,7 @@
 			<li class:selected={$selectItem === item && $activeTabValue === 2}>
 				<button
 				type="button"
+                use:ripple={{color: "rgba(82, 54, 171, 0.2)", duration: 0.6}}
 				on:click={() => {$selectItem = item}}
 				on:keypress={(e) => { if (e.key === 'Enter') { $selectItem= item } }}
 				style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;">
@@ -81,7 +84,7 @@
 		font-size: 0.9rem;
 	}
 	.scrollable {
-		max-height: 13.5vh;
+		max-height: 14vh;
 		overflow-y: auto;
 		width:100%;
 	}

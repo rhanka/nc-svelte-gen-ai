@@ -83,7 +83,7 @@
 		{
 			label: "Document",
 			value: 3,
-			active: selectDocUrl,
+			active: $selectDoc,
 			component: ShowDocument,
 			arguments: {
 				url: selectDocUrl
@@ -193,7 +193,6 @@
 	<div class="pane right">
 		<Tabs
 			items={tabs}
-			bind:activeTabValue={$activeTabValue}
 		>
 		</Tabs>
 	</div>
