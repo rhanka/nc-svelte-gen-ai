@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { referencesList, filteredNonConformities } from './store.js';
+    import { referencesList, filteredNonConformities, activeTabValue, selectItem } from './store.js';
 
     export let nonConformities = [];
 	export let num = 0;
@@ -8,10 +8,6 @@
 
     const dispatch = createEventDispatcher();
     let searchQuery = '';
-
-    function selectItem(item) {
-      dispatch('select', { item });
-    }
 
 	const orderMap = nonConformitiesFilter.reduce((acc, item, index) => {
 		acc[item.doc] = index;
@@ -34,43 +30,49 @@
 	$: console.log(nonConformitiesFilter)
   </script>
 
-  <div>
-	{#if nonConformitiesFilter.length === 0}
-	    <!-- <input
-	      id="search"
-	      type="text"
-	      bind:value={searchQuery}
-	      placeholder="Search by ID, category, or description"
-	    /> -->
-	{:else}
-		<button
-			on:click={() => { nonConformitiesFilter = []; $referencesList = ''}}
-			style="width: 100%;padding: 0.3rem;background-color: #cecece; border: none; cursor: pointer;"
-		>
-        	Clean AI Filter
-      	</button>
+  <div style="position:relative;">
+	{#if nonConformitiesFilter.length > 0}
+		<div style="align:right;padding-right:0.5rem;position:absolute;top:0;right:0;">
+			<button
+				style="cursor:pointer;align:right;border:none;background:none;"
+				on:click={() => { nonConformitiesFilter = []; $referencesList = ''}}
+			>
+				<i style="font-size: 1rem;" class="fas fa-trash-alt"></i> <!-- Logout icon -->
+			</button>
+		</div>
 	{/if}
   </div>
   <div class="scrollable">
 	<ul style="list-style-type: none; padding: 0;">
-			{#each $filteredNonConformities as item, index}
-		<li style="padding: 0; border-bottom: 1px solid #ccc; list-style-type: none;">
-			<button
-			type="button"
-			on:click={() => selectItem(item)}
-			on:keypress={(e) => e.key === 'Enter' && selectItem(item)}
-			style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;">
-			<strong>{item['ATA_code']} - {item['ATA_category']} - {item['nc_event_date'].slice(0, 10)} </strong>
-			<p style="margin-top:0.5rem;margin-bottom:0">{item['analysis_history']['000'][0]['label'].slice(0, 100)}...</p>
-			</button>
-		</li>
+		{#each $filteredNonConformities as item, index}
+			<li class:selected={$selectItem === item && $activeTabValue === 2}>
+				<button
+				type="button"
+				on:click={() => {$selectItem = item}}
+				on:keypress={(e) => { if (e.key === 'Enter') { $selectItem= item } }}
+				style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;">
+				<strong>{item['ATA_code']} - {item['ATA_category']} - {item['nc_event_date'].slice(0, 10)} </strong>
+				<p style="margin-top:0.2rem;margin-bottom:0;">{item['analysis_history']['000'][0]['label'].slice(0, 50)}...</p>
+				</button>
+			</li>
 		{/each}
 	</ul>
   </div>
 
   <style>
+    .selected {
+      border-left: 0.25rem solid;
+      background: rgb(230, 227, 243);
+      border-image: linear-gradient(rgb(227, 25, 55), rgb(82, 54, 171)) 0 100% / 1 / 0 stretch;
+    }
+    li {
+      padding: 0;
+      border: none;
+      list-style-type: none;
+      background: rgb(248, 248, 248);
+    }
     li:hover {
-      background-color: #f0f0f0;
+      background-color: rgb(230, 227, 243);
     }
 	input {
 		padding: 0.35rem!important;
@@ -79,7 +81,7 @@
 		font-size: 0.9rem;
 	}
 	.scrollable {
-		max-height: 20vh;
+		max-height: 13.5vh;
 		overflow-y: auto;
 		width:100%;
 	}
