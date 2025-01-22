@@ -2,6 +2,7 @@
 <script>
 	import { run } from 'svelte/legacy';
 
+	import Header from './Header.svelte';
 	import NonConformityList from './NonConformityList.svelte';
 	import DocumentsList from './DocumentsList.svelte';
 	import NonConformityDetail from './NonConformityDetail.svelte';
@@ -95,6 +96,7 @@
 
 	$: if ($askForHelp) {
 		showChatbot = true;
+		expand = true;
 		let role =  $askForHelp;
 		$askForHelp = false;
 		$createdItem.currentTask = role;
@@ -138,12 +140,16 @@
 	$:	doc_num = documentsList.length;
 </script>
 
-<main>
-  <div class="container">
-    <div
-		class="pane left"
+<Header bind:expand={expand}></Header>
+<div
+	class="MuiDrawer-root MuiDrawer-docked MuiDrawer-root-custom"
+	style="display: {expand ? 'block' : 'none' }"
+>
+	<div
+		class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiDrawer-paper MuiDrawer-paperAnchorLeft MuiDrawer-paperAnchorDockedLeft MuiDrawer-custom"
+		style="transform: none; transition: transform 225ms cubic-bezier(0, 0, 0.2, 1);"
 	>
-		<div style="padding-top:1rem;">
+		<nav class="MuiList-root MuiList-padding" aria-labelledby="nested-list-subheader">
 			{#if doc_num > 0}
 				<PaneItem
 					expand={true}
@@ -160,43 +166,45 @@
 			{#if nc_num > 0}
 				<PaneItem
 					expand={true}
-					title="Non Conformities List"
+					title="Non Conformities"
 					num={nc_num}
 				>
 					<NonConformityList
 						nonConformities={nonConformitiesList}
 						nonConformitiesFilter={nonConformitiesFilter}
 						bind:num={nc_num}
-						on:select={handleSelect}
 					>
 					</NonConformityList>
 				</PaneItem>
 			{/if}
-		</div>
-		<div style="position: absolute;bottom:0">
-			<PaneItem
-				bind:expand={showChatbot}
-				title="AI Agent"
-				num={undefined}
-			>
-				<Chatbot stream={true}>
-				</Chatbot>
-			</PaneItem>
-		</div>
-    </div>
+			<div class="MuiList-root MuiList-padding" style="position: absolute;bottom:60px">
+				<PaneItem
+					bind:expand={showChatbot}
+					title="AI Agent"
+					num={undefined}
+				>
+					<Chatbot stream={true}>
+					</Chatbot>
+				</PaneItem>
+			</div>
+		</nav>
+
+	</div>		
+</div>
+<main style="{expand ? 'margin-left:25rem' : ''}">
 	<div class="pane right">
 		<Tabs
 			items={tabs}
-			bind:activeTabValue={activeTabValue}
+			bind:activeTabValue={$activeTabValue}
 		>
 		</Tabs>
 	</div>
-  </div>
 </main>
 
 <style>
   main {
     padding: 0rem;
+	height: calc(100vh - 75px);
   }
   .container {
     display: flex;
@@ -210,13 +218,40 @@
 	height:100vh;
 	overflow-y: auto;
   }
+  .MuiDrawer-root-custom .MuiDrawer-paper {
+	box-sizing: border-box;
+    top: 75px;
+    width: 25rem;
+    box-shadow: none;
+    filter: drop-shadow(rgba(104, 114, 116, 0.267) 0px 2px 5px);
+    border-left: 1px solid rgb(214, 217, 219);
+    z-index: 200;
+  }
+
+  .MuiDrawer-custom {
+	background-color: rgb(255, 255, 255);
+    color: rgba(0, 0, 0, 0.87);
+    box-shadow: none;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    z-index: 1200;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    flex: 1 0 auto;
+    outline: 0px;
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+  }
   .left {
     width: 25vw;
     display: flex;
     flex-direction: column;
   }
   .right {
-    width: 80%;
     transition: width 0.3s;
+	height:inherit;
   }
 </style>
