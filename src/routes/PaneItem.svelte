@@ -1,5 +1,7 @@
 <script>
     import '@fortawesome/fontawesome-free/css/all.css';
+	import "svelte-ripple-action/ripple.css"
+	import { ripple } from "svelte-ripple-action";
 	export let title;
 	export let num;
 	export let expand = false;
@@ -17,6 +19,7 @@
 	class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters pane"
 	on:click={() => expand=!expand}
 	on:keypress={(e) => { if (e.key === 'Enter') {expand=!expand}}}
+	use:ripple={{color: "rgba(82, 54, 171, 0.2)", duration: 0.6}}
 	tabindex="0"
 	role="button"
 >
@@ -30,14 +33,14 @@
 
 	</div>
 	{#if inverted}
-		<i class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium fas {!expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> 
+		<i class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium fas {!expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
 	{:else}
-		<i class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> 
+		<i class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
 	{/if}
 </div>
 
 {#if mounted}
-	<div 
+	<div
 		class="{expand ? 'show' : 'hide'} MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered"
 	>
 		<div class="MuiCollapse-wrapper MuiCollapse-vertical">
@@ -48,7 +51,7 @@
 			</div>
 		</div>
 	</div>
-{/if}	
+{/if}
 
 <style>
 	.pane {
@@ -89,7 +92,7 @@
     border-left: 0.25rem solid transparent;
     border-bottom: 1px solid rgb(232, 232, 232);
 	}
-	
+
 	.MuiListItemText-root-custom {
 		flex: 1 1 auto;
 		min-width: 0px;
@@ -107,7 +110,7 @@
 
 	/* default behavior */
 	.hide {
-        transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        transition: all 0.5s ease-in-out;
 		opacity: 0;
 		height: 0;
 		display: none;
@@ -115,6 +118,6 @@
 	.show {
         max-height: 1000px; /* Arbitrary large value to ensure content is fully shown */
 		opacity: 1;
-        transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        transition: all 0.5s ease-in-out;
 	}
 </style>

@@ -16,3 +16,6 @@ strong, input, h1, h2, h3, h4, button {
 	font-family: Source Sans Pro, sans-serif;
 }
 
+.MuiCollapse-root::after {
+    transition: all .35s;
+}

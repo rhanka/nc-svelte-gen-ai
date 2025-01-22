@@ -43,15 +43,19 @@
 
 	$: if (highlightContainer.length > 0) {
 		history.forEach((step,index) => {
-			highlightContainer[index].innerHTML = marked(step.description.replace(/###/g,'####'))
-			applyHighlights(highlightContainer[index], highlights);
+			try {
+				highlightContainer[index].innerHTML = marked(step.description.replace(/###/g,'####'))
+				applyHighlights(highlightContainer[index], highlights);
+			} catch (e) {
+				console.error('icilq',highlightContainer[index]);
+			}
 		});
 	}
 
 </script>
 
 
-<div 
+<div
 	class="MuiPaper-root MuiPaper-outlined MuiPaper-rounded MuiCard-root"
 	style="margin-bottom: 1rem;"
 	>
@@ -66,7 +70,7 @@
 				<h3 class="MuiTypography-root MuiTypography-h3 taskTitle">
 					{taskLabel[task]}
 				</h3>
-				<i class="fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> 
+				<i class="fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
 
 		</button>
 	{/if}

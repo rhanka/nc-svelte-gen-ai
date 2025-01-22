@@ -31,7 +31,7 @@
           <div aria-label="Tabs" class="MuiTabs-flexContainer tab-container" role="tablist">
             {#each items as item}
                 <button
-                  use:ripple={{color: "rgba(230, 227, 243, 0.2)", duration: 0.6}}
+                  use:ripple={{color: "rgba(82, 54, 171, 0.2)", duration: 0.6}}
                   class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary tab"
                   class:Mui-selected = {item.value === $activeTabValue}
                   class:tab-selected = {item.value === $activeTabValue}
@@ -106,7 +106,7 @@
     color: rgb(82, 54, 171)!important;
     border-bottom: 4px solid rgb(82, 54, 171)!important;
   }
-  
+
 
   .tab {
     z-index: 1;
