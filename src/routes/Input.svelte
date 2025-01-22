@@ -4,8 +4,8 @@
   export let label = ""; // Le label affich� au-dessus
   export let value = ""; // La valeur de l'input
 
-	let isEditing = false; // D�finit si nous sommes en mode �dition ou non
 	export let markdown = false;
+	let isEditing = false; // D�finit si nous sommes en mode �dition ou non
 
 	// R�f�rence pour le span et l'input
   let span;
@@ -47,6 +47,7 @@
       } else if (markdown) {
         value = "Please provide description";
     }
+
 </script>
 
 <div
@@ -59,14 +60,27 @@
 			class="input-wrapper"
 		>
 	    <span class="size-measure" bind:this={span}></span>
-	    <input
-	      type="text"
-	      bind:value
-	      bind:this={input}
-	      class="editable-input"
-	      on:input={adjustWidth}
-				on:blur={toggleEditing}
-			/>
+      {#if new RegExp(/\[.*\]/).test(value)}
+        <mark>
+          <input
+          type="text"
+          bind:value
+          bind:this={input}
+          class="editable-input"
+          on:input={adjustWidth}
+          on:blur={toggleEditing}
+        />
+        </mark>
+      {:else}
+        <input
+          type="text"
+          bind:value
+          bind:this={input}
+          class="editable-input"
+          on:input={adjustWidth}
+          on:blur={toggleEditing}
+        />
+      {/if}
 	  </div>
   {:else}
     {#if isEditing}
@@ -82,7 +96,7 @@
       class="markdown-wrapper"
       on:click|preventDefault={toggleEditing}
     >
-      {@html marked(value && value.replace(/###/,"####") || "")}
+      {@html marked(value && value.replace(/###/,"####") || "").replace(/(\[[^\]<>]*?\])/gi,'<mark>$1</mark>')}
     </div>
   {/if}
 </div>
