@@ -380,6 +380,7 @@
     gap: 1rem;
     margin-top: 1rem;
     padding: 1rem;
+	padding-bottom:0;
   }
 
   .icon-bar button {
