@@ -1,40 +1,38 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { marked } from 'marked'; // Import the marked library
-    import { referencesList } from './store';
+    import { referencesList, selectDoc, selectItem, activeTabValue } from './store';
 
     export let documentsList = [];
     const dispatch = createEventDispatcher();
     let searchQuery = '';
 
-    function selectDoc(doc) {
-      dispatch('selectDoc', { doc });
-    }
-
   </script>
 
-  <div>
-		{#if documentsList.length > 0}
-			<button
+<div style="position:relative;">
+  {#if documentsList.length > 0}
+    <div style="align:right;padding-right:0.5rem;position:absolute;top:2px;right:2px;">
+      <button
+        style="cursor:pointer;align:right;border:none;background:none;"
         on:click={() => {documentsList = []; $referencesList = '' }}
-        style="width: 100%;padding: 0.3rem;background-color: #cecece; border: none; cursor: pointer;"
       >
-        Clean AI Filter
+        <i style="font-size: 0.75rem;" class="fas fa-trash-alt"></i> 
       </button>
-		{/if}
-  </div>
+    </div>
+  {/if}
+</div>
 
   <div class="scrollable">
     <ul style="list-style-type: none; padding: 0;">
       {#each documentsList as doc, index}
-        <li style="padding: 0; border-bottom: 1px solid #ccc; list-style-type: none;">
+        <li class:selected={$selectDoc === doc && $activeTabValue === 3}>
           <button
             type="button"
-            on:click={() => selectDoc(doc)}
-            on:keypress={(e) => e.key === 'Enter' && selectDoc(doc)}
+            on:click={() => {$selectDoc = doc}}
+            on:keypress={(e) => { if (e.key === 'Enter') { $selectDoc = doc } }}
             style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;">
-            <strong>{doc.doc.replace(/\.md$/,'.pdf')}  </strong>
-            <p style="margin-top:0.2rem;margin-bottom:0rem;">{doc.chunks[0].chunk.slice(0,100)}...</p>
+            <strong>{doc.doc.replace(/\.md$/,'.pdf').slice(0,50)}{ doc.doc.replace(/\.md$/,'.pdf').length > 50 ? '...' : '' }  </strong>
+            <p style="margin-top:0.2rem;margin-bottom:0rem;">{doc.chunks[0].chunk.slice(0,50)}...</p>
           </button>
         </li>
       {/each}
@@ -42,8 +40,19 @@
   </div>
 
   <style>
+    .selected {
+      border-left: 0.25rem solid;
+      background: rgb(230, 227, 243);
+      border-image: linear-gradient(rgb(227, 25, 55), rgb(82, 54, 171)) 0 100% / 1 / 0 stretch;
+    }
+    li {
+      padding: 0;
+      border: none;
+      list-style-type: none;
+      background: rgb(248, 248, 248);
+    }
     li:hover {
-      background-color: #f0f0f0;
+      background-color: rgb(230, 227, 243);
     }
 		input {
 			padding: 0.35rem!important;
@@ -52,7 +61,7 @@
 		}
 
     .scrollable {
-		max-height: 20vh;
+		max-height: 16vh;
 		overflow-y: auto;
     overflow-x: hidden;
 	}
