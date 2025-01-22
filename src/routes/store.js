@@ -91,6 +91,10 @@ let myChatElementRef;
 
 export const defaultAction = writable("Propose task description");
 
+export const selectDoc = writable(null);
+export const selectItem = writable(null);
+export const activeTabValue = writable(1);
+
 createdItem.subscribe(value => {
   myCreatedItem = value;
   ['000','100','200','300','400','500'].forEach(task => {

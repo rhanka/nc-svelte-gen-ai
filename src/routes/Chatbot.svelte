@@ -275,7 +275,7 @@
 		history={history}
 		chatStyle={{
 			"border": "0px",
-			"width": "22.75vw",
+			"width": "24rem",
 			"height": "30vh"
 		}}
 		htmlClassUtilities = {{

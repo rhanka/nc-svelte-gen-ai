@@ -12,7 +12,7 @@
 	import PaneItem from './PaneItem.svelte';
 	import Tabs from './Tabs.svelte';
 	import { nonConformities } from './non_conformities.js';
-	import { askForHelp, referencesList, chatElementRef, defaultAction, createdItem } from './store.js';
+	import { askForHelp, referencesList, chatElementRef, defaultAction, createdItem, selectItem, selectDoc, activeTabValue } from './store.js';
 
 	let maxRows=5000;
 	let apiUrl = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/nc?max_rows=${maxRows}`;
@@ -20,12 +20,11 @@
 	let nonConformitiesFilter = [];
 	let nc_num = 0;
 	let doc_num = 0;
-	let selectedItem = null;
-	let selectedDoc = null;
+	let selectDocUrl = null;
 	let documentsList= [];
 	let tabs = [];
-	let activeTabValue = 1;
 	let showChatbot = false;
+	let expand = false;
 
 	function sortNC(list) {
 		return list.sort(
@@ -33,13 +32,13 @@
 		);
 	}
 
-	function handleSelect(event) {
-		selectedItem = event.detail.item;
-		activeTabValue = 2;
+	$: if ($selectItem !== null) {
+		$activeTabValue = 2;
 	}
 
-	function handleDocumentSelect(event) {
-		selectedDoc = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/doc/${encodeURIComponent(event.detail.doc.doc.replace(/\.md/, '.pdf'))}`;		activeTabValue = 3;
+	$: if ($selectDoc !== null) {
+		selectDocUrl = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/doc/${encodeURIComponent($selectDoc.doc.replace(/\.md/, '.pdf'))}`;
+		$activeTabValue = 3;
 	}
 
 	async function getData () {
@@ -75,19 +74,19 @@
 		{
 			label: "Non Conformity Reference",
 			value: 2,
-			active: selectedItem,
+			active: $selectItem,
 			component: NonConformityDetail,
 			arguments: {
-				selectedItem: selectedItem
+				selectedItem: $selectItem
 			}
 		},
 		{
 			label: "Document",
 			value: 3,
-			active: selectedDoc,
+			active: selectDocUrl,
 			component: ShowDocument,
 			arguments: {
-				url: selectedDoc
+				url: selectDocUrl
 			}
 		}
 		];
@@ -158,7 +157,6 @@
 				>
 					<DocumentsList
 						documentsList={documentsList}
-						on:selectDoc={handleDocumentSelect}
 					>
 					</DocumentsList>
 				</PaneItem>
