@@ -101,7 +101,7 @@
 		$createdItem.currentTask = role;
 		setTimeout(() => {
 			$chatElementRef.submitUserMessage({text: $defaultAction, role: role });
-		}, 100)
+		}, 200)
 	}
 
 	$:	if ($referencesList && $referencesList["non_conformities"]) {
@@ -188,7 +188,7 @@
 			</div>
 		</nav>
 
-	</div>		
+	</div>
 </div>
 <main style="{expand ? 'margin-left:25rem' : ''}">
 	<div class="pane right">

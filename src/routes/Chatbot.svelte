@@ -3,16 +3,20 @@
   	import { marked } from 'marked'; // Import the marked library
 	import { DeepChat } from "deep-chat";
 	import { filteredNonConformities } from './store.js';
+	// import { hop } from './hop.js';
 	let aiUrl = 'https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/ai';
 	export let stream = false;
 	let currentMsg = {};
 	let nativeStream = true;
 	import { createdItem, updateCreatedItem, isUpdating, referencesList, chatElementRef, defaultAction } from './store.js';
+    import { slide } from 'svelte/transition';
+    import { ssrModuleExportsKey } from 'vite/module-runner';
 
 	$: console.log(`Chatbot stream mode: ${stream}; use nativeStream: ${stream && nativeStream}`);
 
 	const history = [
 	];
+
 
 	// Fonction naïve qui ferme guillemets, crochets et accolades restants
 	const completeJSON = (str) => {
@@ -40,12 +44,17 @@
 
 	const parsePartialJSON = (chunk) => {
 		// On concatène le nouveau bout et on tente une fermeture
-		const buffer = chunk;
-		const attempt = completeJSON(buffer);
-		try {
-			const parsed = JSON.parse(attempt);
-			return parsed;
-		} catch {
+		if (chunk) {
+			const buffer = chunk.replace(/\\n/g, '\n');
+			const attempt = completeJSON(buffer);
+			// console.log(attempt);
+			try {
+				const parsed = JSON.parse(attempt);
+				return parsed;
+			} catch {
+				return null;
+			}
+		} else {
 			return null;
 		}
 	}
@@ -96,9 +105,11 @@
 		} catch {
 			json = data.text;
 		}
-		$isUpdating = false;
-		$updateCreatedItem = { role: $createdItem.currentTask, label: json.label, description: json.description};
-		return { text: json.comment }
+		if (json) {
+			$isUpdating = false;
+			$updateCreatedItem = { role: $createdItem.currentTask, label: json.label, description: json.description};
+			return { text: json.comment }
+		}
 	}
 
 	const agentHeadTemplate = {
@@ -148,6 +159,13 @@
 		}
 	}
 
+	// $: console.log(hop);
+	// hop.forEach((m) => console.log(eventProcess(m)));
+
+	const sleep = (ms) => {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
 	const responseInterceptor = async (response) => {
 		if (!stream) {
 			// Lire le Blob comme texte
@@ -156,7 +174,7 @@
 			try {
 				const json = JSON.parse(text);
 				$referencesList = json.sources;
-				console.log('response',json);
+				// console.log('response',json);
 				$isUpdating = false;
 				$updateCreatedItem = { role: $createdItem.currentTask, label: json.label, description: json.description};
 				return {html: marked(json.text)}; // Retourner le JSON � DeepChat
@@ -165,6 +183,9 @@
 				return { error: "Invalid JSON format" }; // Retourner une erreur si le JSON est invalide
 			}
 		} else if (stream && nativeStream) {
+			// await sleep(100);
+			// response = hop.shift();
+			// console.log(response);
 			return eventProcess(response);
 		} else {
 			console.log('process response without custom Stream');
@@ -197,7 +218,7 @@
 			.filter((key) => key < $createdItem.currentTask)
 			.map((key) => $createdItem['analysis_history'][key]);
 		// user_message is implicitely set to inherited requestDetails.body.messages[0].text
-		console.log('ici', $createdItem, $createdItem.currentTask);
+		// console.log('ici', $createdItem, $createdItem.currentTask);
 		requestDetails.body.messages[0].description = $createdItem['analysis_history'][$createdItem.currentTask][0];
 		if ($referencesList) {
 			requestDetails.body.messages[0].sources = $referencesList;
@@ -265,9 +286,9 @@
 			"default": {
 				"shared": {
 					"bubble": {
-					"maxWidth": "100%", 
-					"backgroundColor": "unset", 
-					"marginTop": "10px", 
+					"maxWidth": "100%",
+					"backgroundColor": "unset",
+					"marginTop": "10px",
 					"marginBottom": "10px",
 					"font-family": "Source Sans Pro, sans-serif"
 				}},
@@ -299,7 +320,7 @@
 				},
 				styles: {
 					default: {
-						backgroundColor: '#fff', 
+						backgroundColor: '#fff',
 						display: "inline-block",
 						"-webkit-transition": "all 0.2s ease",
 						"transition": "all 0.2s ease",
@@ -308,8 +329,8 @@
 						borderRadius: "20px",
 						color: "#151515",
 						border: "1px solid #bbb",
-						padding: '10px', 
-						cursor: 'pointer', 
+						padding: '10px',
+						cursor: 'pointer',
 						textAlign: 'center',
 						"font-family": "Source Sans Pro, sans-serif"
 					},
