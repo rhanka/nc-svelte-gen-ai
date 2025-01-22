@@ -228,7 +228,10 @@
 		textInput={
 				{
 			"styles": {
-			"text": {"color": "black"},
+			"text": {
+				"color": "black",
+				"font-family": "Source Sans Pro, sans-serif"
+			},
 			"container": {
 					"width": "100%",
 					"border-radius": "0px",
@@ -240,34 +243,42 @@
 		}
 		intropanel={{
 			"styles": {
-			"container": {
-				"backgroundColor": "rgba(247,247,248)",
-				"borderTop": "1px solid rgba(0,0,0,.1)",
-				"borderBottom": "1px solid rgba(0,0,0,.1)"
-			},
-			"header": {
-				"color": "black"
-			},
-			"body": {
-				"color": "black"
-			}
+				"container": {
+					"backgroundColor": "rgba(247,247,248)",
+					"borderTop": "1px solid rgba(0,0,0,.1)",
+					"borderBottom": "1px solid rgba(0,0,0,.1)"
+				},
+				"header": {
+					"color": "black"
+				},
+				"body": {
+					"color": "black"
+				},
+				"text": {
+					"font-family": "Source Sans Pro, sans-serif"
+				}
 			},
 			"header": "Welcome to the Non-Conformity Chatbot",
 			"body": "I'm here to help you with your non-conformity tasks. Please provide me with the necessary information to help you."
 		}}
 		messageStyles={{
 			"default": {
-			"shared": {
-				"bubble": {
-				"maxWidth": "100%", "backgroundColor": "unset", "marginTop": "10px", "marginBottom": "10px"}},
-			"user": {
-				"bubble": {
-				"color": "black"}},
-			"ai": {
-				"outerContainer": {
-				"backgroundColor": "rgba(247,247,248)", "borderTop": "1px solid rgba(0,0,0,.1)", "borderBottom": "1px solid rgba(0,0,0,.1)"
+				"shared": {
+					"bubble": {
+					"maxWidth": "100%", 
+					"backgroundColor": "unset", 
+					"marginTop": "10px", 
+					"marginBottom": "10px",
+					"font-family": "Source Sans Pro, sans-serif"
+				}},
+				"user": {
+					"bubble": {
+					"color": "black"}},
+				"ai": {
+					"outerContainer": {
+					"backgroundColor": "rgba(247,247,248)", "borderTop": "1px solid rgba(0,0,0,.1)", "borderBottom": "1px solid rgba(0,0,0,.1)"
+					}
 				}
-			}
 			}
 		}}
 		responseInterceptor={responseInterceptor}
@@ -276,7 +287,7 @@
 		chatStyle={{
 			"border": "0px",
 			"width": "24rem",
-			"height": "30vh"
+			"height": "36vh"
 		}}
 		htmlClassUtilities = {{
 			'custom-button': {
@@ -287,9 +298,28 @@
 				},
 				},
 				styles: {
-				default: {backgroundColor: '#f2f2f2', borderRadius: '10px', padding: '10px', cursor: 'pointer', textAlign: 'center'},
-				hover: {backgroundColor: '#ebebeb'},
-				click: {backgroundColor: '#e4e4e4'},
+					default: {
+						backgroundColor: '#fff', 
+						display: "inline-block",
+						"-webkit-transition": "all 0.2s ease",
+						"transition": "all 0.2s ease",
+						"padding": "3px 15px",
+						"font-size": "15px",
+						borderRadius: "20px",
+						color: "#151515",
+						border: "1px solid #bbb",
+						padding: '10px', 
+						cursor: 'pointer', 
+						textAlign: 'center',
+						"font-family": "Source Sans Pro, sans-serif"
+					},
+					hover: {
+						"background-color": "#5236ab",
+						color:"#fff",
+						"text-decoration": "none",
+						"border-color": "#5236ab"
+					},
+					click: {backgroundColor: '#e4e4e4'},
 				},
 			},
 			'custom-button-text': {styles: {default: {pointerEvents: 'none'}}},
@@ -312,7 +342,6 @@
 
 <style>
   main {
-    font-family: sans-serif;
     text-align: center;
     justify-content: center;
     display: grid;

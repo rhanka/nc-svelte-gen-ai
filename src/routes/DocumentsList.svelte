@@ -64,7 +64,7 @@
 		}
 
     .scrollable {
-		max-height: 16vh;
+		max-height: 15vh;
 		overflow-y: auto;
     overflow-x: hidden;
 	}

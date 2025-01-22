@@ -80,28 +80,33 @@
 </script>
 
 
-<div style="padding: 0; border-bottom: 1px solid #eee; margin-top:-2px; list-style-type: none;">
+<div 
+	class="MuiPaper-root MuiPaper-outlined MuiPaper-rounded MuiCard-root"
+	style="margin-bottom: 1rem;"
+>
 	{#if task}
 		<button
 			type="button"
 			on:click={handleClick}
 			on:keypress={(e) => e.key === 'Enter' && handleClick()}
-			style="cursor: pointer; padding: 0px; width: 100%; text-align: left; border: none; background: #eee;"
+			class="MuiCardActions-root"
+			style="cursor: pointer; display: flex; padding: 0px; width: 100%; text-align: left; border: none; background: none;"
 		>
-			<h3>
-				<span style="padding: 0 8px;">{expand ? '-' : '+'}</span>
+			<h3 class="MuiTypography-root MuiTypography-h3 taskTitle">
 				{taskLabel[task]}
-				{#if aiHelp}
+				{#if aiHelp && expand}
 					<a
 						href="/"
 						on:click|stopPropagation|preventDefault={() => $askForHelp=task}
 						on:keypress={(e) => {if (e.key === 'Enter') {$askForHelp = task}}}
-						style="margin-left:.25rem;cursor: help; text-decoration:none; padding: 0px; width: 100%; text-align: left; border: none; background: transparent;"
+						class="helper"
+						style="margin-left:1rem;padding-bottom:.2rem;cursor: help; text-decoration:none;"
 					>
-						<i style="font-size: 1rem;" class="fas fa-wand-magic"></i> <!-- Logout icon -->
+						AI Assitant
 					</a>
 				{/if}
 			</h3>
+			<i class="fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> 
 		</button>
 	{/if}
 
@@ -110,7 +115,6 @@
 			<div class="left-column {$isUpdating === task ? 'gradiant' : ''}">
 				{#if $createdItem.analysis_history[task] && $createdItem.analysis_history[task].length}
 					{#each $createdItem.analysis_history[task] as step}
-						<li style="padding: 8px; border-bottom: 1px solid #eee;">
 							<h4><Input bind:value={step.label} label="Label"/> - <Input bind:value={step.date} label="Date"/> </h4>
 
 							<Input label="Role" bind:value={step['role']}/> -
@@ -152,7 +156,6 @@
 									{/each}
 								{/if}
 							</div>
-						</li>
 					{/each}
 				{/if}
 			</div>
@@ -287,6 +290,24 @@
     margin-bottom:0;
   }
 
+  .helper {
+    display: inline-block;
+    background-color: #fff;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    padding: 3px 15px;
+    font-size: 15px;
+    border-radius: 20px;
+    color: #151515;
+    border: 1px solid #bbb;
+  }
+
+  .helper:hover {
+	background-color: #5236ab;
+    color: #fff;
+    text-decoration: none;
+    border-color: #5236ab;
+  }
 
   /* Gestion des colonnes en mode responsive */
   @media (max-width: 768px) {
@@ -359,7 +380,6 @@
     gap: 1rem;
     margin-top: 1rem;
     padding: 1rem;
-    border-top: 1px solid #eee;
   }
 
   .icon-bar button {
@@ -380,5 +400,35 @@
     transform: scale(1.1);
   }
 
+  .taskTitle {
+		margin: 0px;
+		margin-bottom: 1rem;
+		font-family: "Source Sans Pro", -apple-system, sans-serif, Arial;
+		line-height: 1.167;
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: rgb(51, 51, 51);
+		flex: 1 1 auto;
+	}
+
+  .MuiPaper-root {
+	background-color: rgb(255, 255, 255);
+    color: rgb(51, 51, 51);
+    box-shadow: rgb(232, 232, 232) 0px 4px inset;
+    transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    border-radius: 0px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(232, 232, 232);
+    border-image: initial;
+    padding: 2rem;
+}
+.MuiCardActions-root {
+	display: flex;
+	-webkit-box-align: center;
+	align-items: center;
+	padding: 0px;
+}
 </style>
 

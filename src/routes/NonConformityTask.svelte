@@ -1,6 +1,6 @@
 <script>
-	import { onMount } from 'svelte';
 	import { marked } from 'marked'; // Import the marked library
+    import '@fortawesome/fontawesome-free/css/all.css';
 	import { taskLabel } from './store.js';
 	export let task;
 	export let history;
@@ -50,27 +50,32 @@
 
 </script>
 
-<div style="padding: 0; border-bottom: 1px solid #eee; margin-top:-2px; list-style-type: none;">
+
+<div 
+	class="MuiPaper-root MuiPaper-outlined MuiPaper-rounded MuiCard-root"
+	style="margin-bottom: 1rem;"
+	>
 	{#if task}
 		<button
 			type="button"
 			on:click={() => {expand = !expand}}
 			on:keypress={(e) => e.key === 'Enter' && selectItem(item)}
-			style="cursor: pointer; padding: 0px; width: 100%; text-align: left; border: none; background: #eee;">
-				<h3>
-					<span style="padding: 0 8px;">{expand ? '-' : '+'}</span>
+			class="MuiCardActions-root"
+			style="cursor: pointer; display: flex; padding: 0px; width: 100%; text-align: left; border: none; background: none;"
+			>
+				<h3 class="MuiTypography-root MuiTypography-h3 taskTitle">
 					{taskLabel[task]}
 				</h3>
+				<i class="fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> 
+
 		</button>
 	{/if}
 	{#if history && expand}
 		{#each history as step, index}
-			<li style="padding: 8px; border-bottom: 1px solid #eee;">
-				<h4>{step.label} - {step.date.replace(/:..\..*/,"")}</h4>
-				<div bind:this={highlightContainer[index]}>
-					{@html marked(step.description.replace(/###/g,'####'))}
-				</div>
-			</li>
+			<h4>{step.label} - {step.date.replace(/:..\..*/,"")}</h4>
+			<div bind:this={highlightContainer[index]}>
+				{@html marked(step.description.replace(/###/g,'####'))}
+			</div>
 		{/each}
 	{/if}
 </div>
@@ -80,5 +85,34 @@
 		padding: 1rem;
 		transition: width 0.3s;
 	}
+	.taskTitle {
+		margin: 0px;
+		font-family: "Source Sans Pro", -apple-system, sans-serif, Arial;
+		line-height: 1.167;
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: rgb(51, 51, 51);
+		flex: 1 1 auto;
+	}
+
+	.MuiPaper-root {
+	background-color: rgb(255, 255, 255);
+    color: rgb(51, 51, 51);
+    box-shadow: rgb(232, 232, 232) 0px 4px inset;
+    transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    border-radius: 0px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(232, 232, 232);
+    border-image: initial;
+    padding: 2rem;
+}
+.MuiCardActions-root {
+	display: flex;
+	-webkit-box-align: center;
+	align-items: center;
+	padding: 0px;
+}
 </style>
 

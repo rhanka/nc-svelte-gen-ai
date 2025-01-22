@@ -84,7 +84,7 @@
 		font-size: 0.9rem;
 	}
 	.scrollable {
-		max-height: 14vh;
+		max-height: 15vh;
 		overflow-y: auto;
 		width:100%;
 	}

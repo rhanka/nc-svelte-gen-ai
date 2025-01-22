@@ -23,46 +23,48 @@
 
 <Menu on:changeView={handleChangeView} />
 
-<div class="MuiBox-root">
-  <div class="MuiBox-root tab-root">
-    <div class="MuiTabs-flexContainer tab-container">
-      <div class="MuiTabs-scroller MuiTabs-fixed tab-scroller">
-        <div aria-label="Tabs" class="MuiTabs-flexContainer tab-container" role="tablist">
-          {#each items as item}
-              <button
-                use:ripple={{color: "rgba(230, 227, 243, 0.2)", duration: 0.6}}
-                class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary tab"
-                class:Mui-selected = {item.value === $activeTabValue}
-                class:tab-selected = {item.value === $activeTabValue}
-                class:inactive = {item.value !== $activeTabValue}
-                on:click={handleClick(item.value)}
-                on:keypress={(e) => e.key === 'Enter' && handleClick(item)}
-                disabled={!item.active}
-              >
-                {item.label}
-                <span class="MuiTouchRipple-root Ripple"></span>
-              </button>
-          {/each}
-          <span class="tab-container"></span>
+<div style="background-color: #f6f7f7;height:100%;overflow:hidden">
+  <div class="MuiBox-root">
+    <div class="MuiBox-root tab-root">
+      <div class="MuiTabs-flexContainer tab-container">
+        <div class="MuiTabs-scroller MuiTabs-fixed tab-scroller">
+          <div aria-label="Tabs" class="MuiTabs-flexContainer tab-container" role="tablist">
+            {#each items as item}
+                <button
+                  use:ripple={{color: "rgba(230, 227, 243, 0.2)", duration: 0.6}}
+                  class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary tab"
+                  class:Mui-selected = {item.value === $activeTabValue}
+                  class:tab-selected = {item.value === $activeTabValue}
+                  class:inactive = {item.value !== $activeTabValue}
+                  on:click={handleClick(item.value)}
+                  on:keypress={(e) => e.key === 'Enter' && handleClick(item)}
+                  disabled={!item.active}
+                >
+                  {item.label}
+                  <span class="MuiTouchRipple-root Ripple"></span>
+                </button>
+            {/each}
+            <span class="tab-container"></span>
 
+          </div>
+          <span class="tab-underline"></span>
         </div>
-        <span class="tab-underline"></span>
       </div>
     </div>
   </div>
-</div>
-<div class="content">
-  {#if currentView === 'tabs'}
-    {#each items as item}
-      {#if item.loaded}
-        <div class="box" style="display: {$activeTabValue == item.value ? 'block' : 'none'}">
-          <svelte:component this={item.component} {...item.arguments}/>
-        </div>
-      {/if}
-    {/each}
-  {:else}
-    <AuthForm type={currentView} on:changeView={handleChangeView} />
-  {/if}
+  <div class="content">
+    {#if currentView === 'tabs'}
+      {#each items as item}
+        {#if item.loaded}
+          <div class="box" style="display: {$activeTabValue == item.value ? 'block' : 'none'}">
+            <svelte:component this={item.component} {...item.arguments}/>
+          </div>
+        {/if}
+      {/each}
+    {:else}
+      <AuthForm type={currentView} on:changeView={handleChangeView} />
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -90,7 +92,6 @@
   .tab-underline {
     position: absolute;
     top:-4px;
-    z-index: -1;
     width:100%;
     height: calc(100%);
     border-bottom: 4px solid rgb(233, 235, 237);
@@ -108,6 +109,7 @@
   
 
   .tab {
+    z-index: 1;
     display: inline-flex;
     -webkit-box-align: center;
     align-items: center;
@@ -160,14 +162,13 @@
     flex: 1;
     overflow-y: auto;
     padding: 1rem;
-    background-color: #fff;
-    border: 1px solid #dee2e6;
     border-top: none;
+    height: 89%;
   }
   .box {
     margin-bottom: 10px;
     padding: 0px;
-    border: 1px solid #dee2e6;
     border-radius: 0 0 .5rem .5rem;
   }
+
 </style>

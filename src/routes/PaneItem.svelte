@@ -3,6 +3,7 @@
 	export let title;
 	export let num;
 	export let expand = false;
+	export let inverted = false;
 	let mounted = expand;
 
 	$: if (expand === true) {
@@ -28,8 +29,11 @@
 		</span>
 
 	</div>
-	<i class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium fas {expand ? 'fa-chevron-down' : 'fa-chevron-down'}"></i> <!-- Logout icon -->
-	<span class="MuiTouchRipple-root css-w0pj6f"></span>
+	{#if inverted}
+		<i class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium fas {!expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> 
+	{:else}
+		<i class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> 
+	{/if}
 </div>
 
 {#if mounted}
@@ -106,6 +110,7 @@
         transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
 		opacity: 0;
 		height: 0;
+		display: none;
 	}
 	.show {
         max-height: 1000px; /* Arbitrary large value to ensure content is fully shown */

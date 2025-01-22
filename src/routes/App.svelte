@@ -180,6 +180,7 @@
 					bind:expand={showChatbot}
 					title="AI Agent"
 					num={undefined}
+					inverted={true}
 				>
 					<Chatbot stream={true}>
 					</Chatbot>
