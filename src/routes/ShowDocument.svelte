@@ -1,162 +1,165 @@
 <script>
   // @ts-nocheck
 
-  import * as pdfjs from 'pdfjs-dist'
-  import { onDestroy, tick } from 'svelte'
-  import { calcRT, getPageText, onPrint, savePDF } from './ShowDocumentHelper.svelte'
-  import Tooltip from './ShowDocumentTooltip.svelte'
+  import * as pdfjs from "pdfjs-dist";
+  import { onDestroy, tick } from "svelte";
+  import {
+    calcRT,
+    getPageText,
+    onPrint,
+    savePDF,
+  } from "./ShowDocumentHelper.svelte";
+  import Tooltip from "./ShowDocumentTooltip.svelte";
 
-  export let url
-  export let data
-  export let scale = 1.0 //must be number
-  export let pageNum = 1 //must be number
-  export let flipTime = 120 //by default 2 minute, value in seconds
-  export let showButtons = [
-    'navigation',
-    'zoom',
-    'rotate',
-    'pageInfo',
-  ] //array
-  export let showBorder = true //boolean
-  export let totalPage = 0
-  export let downloadFileName = ''
-  export let showTopButton = true // boolean
-  export let onProgress = undefined
+  export let url;
+  export let data;
+  export let scale = 1.0; //must be number
+  export let pageNum = 1; //must be number
+  export let flipTime = 120; //by default 2 minute, value in seconds
+  export let showButtons = ["navigation", "zoom", "rotate", "pageInfo"]; //array
+  export let showBorder = true; //boolean
+  export let totalPage = 0;
+  export let downloadFileName = "";
+  export let showTopButton = true; // boolean
+  export let onProgress = undefined;
 
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL( 'pdfjs-dist/build/pdf.worker.mjs', import.meta.url).toString();
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/build/pdf.worker.mjs",
+    import.meta.url,
+  ).toString();
 
-  let loaded = false
-  let canvas
-  let page_num = 0
-  let pageCount = 0
-  let pdfDoc = null
-  let pageRendering = false
-  let pageNumPending = null
-  let rotation = 0
-  let pdfContent = ''
-  let readingTime = 0
-  let autoFlip = false
-  let interval
-  let secondInterval
-  let seconds = flipTime
-  let pages = []
-  let password = ''
-  let passwordError = false
-  let passwordMessage = ''
-  let isInitialized = false
-  const minScale = 1.0
-  const maxScale = 2.3
+  let loaded = false;
+  let canvas;
+  let page_num = 0;
+  let pageCount = 0;
+  let pdfDoc = null;
+  let pageRendering = false;
+  let pageNumPending = null;
+  let rotation = 0;
+  let pdfContent = "";
+  let readingTime = 0;
+  let autoFlip = false;
+  let interval;
+  let secondInterval;
+  let seconds = flipTime;
+  let pages = [];
+  let password = "";
+  let passwordError = false;
+  let passwordMessage = "";
+  let isInitialized = false;
+  const minScale = 1.0;
+  const maxScale = 2.3;
 
-  const renderPage = num => {
-    pageRendering = true
+  const renderPage = (num) => {
+    pageRendering = true;
     // Using promise to fetch the page
     pdfDoc.getPage(num).then(function (page) {
-      let viewport = page.getViewport({ scale: scale, rotation: rotation })
-      const canvasContext = canvas.getContext('2d')
-      canvas.height = viewport.height
-      canvas.width = viewport.width
+      let viewport = page.getViewport({ scale: scale, rotation: rotation });
+      const canvasContext = canvas.getContext("2d");
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
 
       // Render PDF page into canvas context
       let renderContext = {
         canvasContext,
         viewport,
-      }
-      let renderTask = page.render(renderContext)
+      };
+      let renderTask = page.render(renderContext);
 
       // Wait for rendering to finish
       renderTask.promise.then(function () {
-        pageRendering = false
+        pageRendering = false;
         if (pageNumPending !== null) {
           // New page rendering is pending
           // renderPage(pageNumPending);
           if (pageNum < pdfDoc.totalPage) {
-            pages[pageNum] = canvas
-            pageNum++
-            pdfDoc.getPage(pageNum).then(renderPage)
+            pages[pageNum] = canvas;
+            pageNum++;
+            pdfDoc.getPage(pageNum).then(renderPage);
           } else {
             for (let i = 1; i < pages.length; i++) {
-              canvas.appendChild(pages[i])
+              canvas.appendChild(pages[i]);
             }
           }
-          pageNumPending = null
+          pageNumPending = null;
         }
-      })
-    })
+      });
+    });
 
     // Update page counters
-    showButtons.length ? (page_num.textContent = num) : null
-  }
+    showButtons.length ? (page_num.textContent = num) : null;
+  };
 
   $: if (url) {
     loaded = false;
-    initialLoad()
+    initialLoad();
   }
 
-  const queueRenderPage = num => {
+  const queueRenderPage = (num) => {
     if (pageRendering) {
-      pageNumPending = num
+      pageNumPending = num;
     } else {
-      renderPage(num)
+      renderPage(num);
     }
-  }
+  };
 
   /**
    * Displays previous page.
    */
   const onPrevPage = () => {
     if (pageNum <= 1) {
-      return
+      return;
     }
-    pageNum--
-    queueRenderPage(pageNum)
-  }
+    pageNum--;
+    queueRenderPage(pageNum);
+  };
 
   /**
    * Displays next page.
    */
   const onNextPage = () => {
     if (pageNum >= pdfDoc.numPages) {
-      return
+      return;
     }
-    pageNum++
-    queueRenderPage(pageNum)
-  }
+    pageNum++;
+    queueRenderPage(pageNum);
+  };
   /*
    * Display Zoom In
    */
   const onZoomIn = () => {
     if (scale <= maxScale) {
-      scale = scale + 0.1
-      queueRenderPage(pageNum)
+      scale = scale + 0.1;
+      queueRenderPage(pageNum);
     }
-  }
+  };
   /*
    * Display Zoom Out
    */
   const onZoomOut = () => {
     if (scale >= minScale) {
-      scale = scale - 0.1
-      queueRenderPage(pageNum)
+      scale = scale - 0.1;
+      queueRenderPage(pageNum);
     }
-  }
+  };
 
-  const printPdf = url => {
-    onPrint(url)
-  }
+  const printPdf = (url) => {
+    onPrint(url);
+  };
 
   const clockwiseRotate = () => {
-    rotation = rotation + 90
-    queueRenderPage(pageNum)
-  }
+    rotation = rotation + 90;
+    queueRenderPage(pageNum);
+  };
 
   const antiClockwiseRotate = () => {
-    rotation = rotation - 90
-    queueRenderPage(pageNum)
-  }
+    rotation = rotation - 90;
+    queueRenderPage(pageNum);
+  };
 
   const onPasswordSubmit = () => {
-    initialLoad()
-  }
+    initialLoad();
+  };
 
   /**
    * Asynchronously downloads PDF.
@@ -168,76 +171,76 @@
       ...(url && { url }),
       ...(data && { data }),
       ...(password && { password }),
-    })
-    loadingTask.onProgress = onProgress
+    });
+    loadingTask.onProgress = onProgress;
 
     loadingTask.promise
       .then(async function (pdfDoc_) {
         loaded = true;
-        pdfDoc = pdfDoc_
-        passwordError = false
-        await tick()
+        pdfDoc = pdfDoc_;
+        passwordError = false;
+        await tick();
 
-        showButtons.length ? (pageCount.textContent = pdfDoc.numPages) : null
-        totalPage = pdfDoc.numPages
+        showButtons.length ? (pageCount.textContent = pdfDoc.numPages) : null;
+        totalPage = pdfDoc.numPages;
         if (showButtons.length) {
           for (let number = 1; number <= totalPage; number++) {
             // Extract the text
             getPageText(number, pdfDoc).then(function (textPage) {
               // Show the text of the page in the console
-              pdfContent = pdfContent.concat(textPage)
-              readingTime = calcRT(pdfContent)
-            })
+              pdfContent = pdfContent.concat(textPage);
+              readingTime = calcRT(pdfContent);
+            });
           }
         }
-        isInitialized = true
+        isInitialized = true;
       })
       .catch(function (error) {
-        passwordError = true
-        passwordMessage = error.message
-      })
-  }
-  initialLoad()
-  $: if (isInitialized) queueRenderPage(pageNum)
+        passwordError = true;
+        passwordMessage = error.message;
+      });
+  };
+  initialLoad();
+  $: if (isInitialized) queueRenderPage(pageNum);
 
   //turn page after certain time interval
   const onPageTurn = () => {
-    autoFlip = !autoFlip
+    autoFlip = !autoFlip;
     if (autoFlip === false) {
-      clearInterval(interval) //stop autoflip
-      clearInterval(secondInterval) //stop countdown seconds
+      clearInterval(interval); //stop autoflip
+      clearInterval(secondInterval); //stop countdown seconds
     }
     if (autoFlip === true && pageNum <= totalPage) {
       //countdown seconds
       secondInterval = setInterval(() => {
-        seconds = seconds - 1
-      }, 1000)
+        seconds = seconds - 1;
+      }, 1000);
       interval = setInterval(() => {
-        seconds = flipTime //reset second after page flip
-        onNextPage()
-      }, flipTime * 1000) //every {flipTime} seconds
+        seconds = flipTime; //reset second after page flip
+        onNextPage();
+      }, flipTime * 1000); //every {flipTime} seconds
     }
-  }
+  };
   //Download pdf function
   const downloadPdf = ({ url: fileUrl, data }) => {
     let fileName =
       downloadFileName ||
-      (fileUrl && fileUrl.substring(fileUrl.lastIndexOf('/') + 1))
-    savePDF({ fileUrl, data, name: fileName })
-  }
+      (fileUrl && fileUrl.substring(fileUrl.lastIndexOf("/") + 1));
+    savePDF({ fileUrl, data, name: fileName });
+  };
   //prevent memory leak
   onDestroy(() => {
-    clearInterval(interval)
-    clearInterval(secondInterval)
-  })
+    clearInterval(interval);
+    clearInterval(secondInterval);
+  });
 
-  let pageWidth
-  let pageHeight
+  let pageWidth;
+  let pageHeight;
 </script>
 
 <svelte:window bind:innerWidth={pageWidth} bind:innerHeight={pageHeight} />
 <div class="parent">
-  <div class={showBorder === true ? 'control' : 'null'}>
+  <div class={showBorder === true ? "control" : "null"}>
     {#if passwordError === true}
       <div class="password-viewer">
         <p>This document requires a password to open:</p>
@@ -252,7 +255,7 @@
     {:else if showButtons.length}
       <div class="control-start">
         <div class="line">
-          {#if showButtons.includes('navigation')}
+          {#if showButtons.includes("navigation")}
             <Tooltip>
               <span
                 role="button"
@@ -300,7 +303,7 @@
               Next
             </Tooltip>
           {/if}
-          {#if showButtons.includes('zoom')}
+          {#if showButtons.includes("zoom")}
             <Tooltip>
               <span
                 role="button"
@@ -350,7 +353,7 @@
               Zoom Out
             </Tooltip>
           {/if}
-          {#if showButtons.includes('print')}
+          {#if showButtons.includes("print")}
             <Tooltip>
               <span
                 role="button"
@@ -374,7 +377,7 @@
               Print
             </Tooltip>
           {/if}
-          {#if showButtons.includes('rotate')}
+          {#if showButtons.includes("rotate")}
             <Tooltip>
               <span
                 role="button"
@@ -420,7 +423,7 @@
               Clockwise
             </Tooltip>
           {/if}
-          {#if showButtons.includes('download')}
+          {#if showButtons.includes("download")}
             <Tooltip>
               <span
                 role="button"
@@ -441,7 +444,7 @@
               Download
             </Tooltip>
           {/if}
-          {#if showButtons.includes('autoflip')}
+          {#if showButtons.includes("autoflip")}
             <Tooltip>
               <span
                 role="button"
@@ -467,12 +470,12 @@
                   {/if}
                 </svg>
               </span>
-              {autoFlip === true ? seconds : 'Auto Turn Page'}
+              {autoFlip === true ? seconds : "Auto Turn Page"}
             </Tooltip>
           {/if}
           <span
             class="page-info"
-            style={showButtons.includes('timeInfo') ? '' : 'display: none;'}
+            style={showButtons.includes("timeInfo") ? "" : "display: none;"}
           >
             <svg
               class="icon"
@@ -490,7 +493,7 @@
           </span>
           <span
             class="page-info"
-            style={showButtons.includes('pageInfo') ? '' : 'display: none;'}
+            style={showButtons.includes("pageInfo") ? "" : "display: none;"}
           >
             <svg
               class="icon"
@@ -511,18 +514,18 @@
             </div>
           </span>
         </div>
-        <div class={showBorder === true ? 'viewer' : 'null'}>
+        <div class={showBorder === true ? "viewer" : "null"}>
           {#if loaded}
             <canvas bind:this={canvas} width={pageWidth} height={pageHeight} />
           {:else}
             <div class="loader">
-                <i class="fas fa-spinner fa-spin"></i> Chargement...
+              <i class="fas fa-spinner fa-spin"></i> Chargement...
             </div>
           {/if}
         </div>
       </div>
     {:else}
-      <div class={showBorder === true ? 'viewer' : 'null'}>
+      <div class={showBorder === true ? "viewer" : "null"}>
         <canvas bind:this={canvas} />
         <!-- width={window.innerWidth} -->
         <!-- height={window.innerHeight}  -->
@@ -673,7 +676,7 @@
     transform: scaleX(-1);
   }
 
-#topBtn {
+  #topBtn {
     position: fixed;
     bottom: 10px;
     float: right;
@@ -687,7 +690,7 @@
     border-radius: 9999px;
   }
 
-#topBtn:hover {
+  #topBtn:hover {
     background-color: #000;
     color: #fff;
   }
@@ -836,19 +839,22 @@
     }
   }
 
-
-      .loader {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 95vh;
-        background-color: rgba(255, 255, 255, 0.8); /* Optional: semi-transparent background */
-        font-size: 1.5em; /* Adjust size as needed */
-    }
-    .loader i {
-        margin-right: 0.5em;
-        font-size: 1.5em; /* Make the spinner larger */
-    }
-
+  .loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 95vh;
+    background-color: rgba(
+      255,
+      255,
+      255,
+      0.8
+    ); /* Optional: semi-transparent background */
+    font-size: 1.5em; /* Adjust size as needed */
+  }
+  .loader i {
+    margin-right: 0.5em;
+    font-size: 1.5em; /* Make the spinner larger */
+  }
 </style>

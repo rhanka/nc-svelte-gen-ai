@@ -1,106 +1,138 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
-    import { referencesList, filteredNonConformities, activeTabValue, selectItem } from './store.js';
-	import "svelte-ripple-action/ripple.css"
-	import { ripple } from "svelte-ripple-action";
+  import { createEventDispatcher } from "svelte";
+  import {
+    referencesList,
+    filteredNonConformities,
+    activeTabValue,
+    selectItem,
+  } from "./store.js";
+  import "svelte-ripple-action/ripple.css";
+  import { ripple } from "svelte-ripple-action";
 
-    export let nonConformities = [];
-	export let num = 0;
-	export let nonConformitiesFilter = [];
+  export let nonConformities = [];
+  export let num = 0;
+  export let nonConformitiesFilter = [];
 
-    const dispatch = createEventDispatcher();
-    let searchQuery = '';
+  const dispatch = createEventDispatcher();
+  let searchQuery = "";
 
-	const orderMap = nonConformitiesFilter.reduce((acc, item, index) => {
-		acc[item.doc] = index;
-		return acc;
-	}, {});
+  const orderMap = nonConformitiesFilter.reduce((acc, item, index) => {
+    acc[item.doc] = index;
+    return acc;
+  }, {});
 
-	$:	$filteredNonConformities = nonConformities
-			.filter(item => nonConformitiesFilter.some(n => n.doc === item['nc_event_id']))
-			.map(item => {
-				item.highlights = nonConformitiesFilter
-					.filter(n => n.doc === item['nc_event_id'])
-					.map(n => n.content);
-				return item;
-			})
-			.sort((a, b) => orderMap[a['nc_event_id']] - orderMap[b['nc_event_id']]);
-	// }
+  $: $filteredNonConformities = nonConformities
+    .filter((item) =>
+      nonConformitiesFilter.some((n) => n.doc === item["nc_event_id"]),
+    )
+    .map((item) => {
+      item.highlights = nonConformitiesFilter
+        .filter((n) => n.doc === item["nc_event_id"])
+        .map((n) => n.content);
+      return item;
+    })
+    .sort(
+      (a, b) => orderMap[a["nc_event_id"]] - orderMap[b["nc_event_id"]],
+    );
+  // }
 
-	$: num = $filteredNonConformities.length;
+  $: num = $filteredNonConformities.length;
 
-	$: console.log(nonConformitiesFilter)
-  </script>
+  $: console.log(nonConformitiesFilter);
+</script>
 
-  <div style="position:relative;">
-	{#if nonConformitiesFilter.length > 0}
-		<div style="align:right;padding-right:0.5rem;position:absolute;top:2px;right:2px;">
-			<button
-				style="cursor:pointer;align:right;border:none;background:none;"
-				on:click={() => { nonConformitiesFilter = []; $referencesList = ''}}
-			>
-				<i style="font-size: 0.75rem;" class="fas fa-trash-alt"></i> 
-			</button>
-		</div>
-	{/if}
-  </div>
-  <div class="scrollable">
-	<ul style="list-style-type: none; padding: 0;">
-		{#each $filteredNonConformities as item, index}
-			<li class:selected={$selectItem === item && $activeTabValue === 2}>
-				<button
-				type="button"
-                use:ripple={{color: "rgba(82, 54, 171, 0.2)", duration: 0.6}}
-				on:click={() => {$selectItem = item}}
-				on:keypress={(e) => { if (e.key === 'Enter') { $selectItem= item } }}
-				style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;">
-				<strong>{item['ATA_code']} - {item['ATA_category']} - {item['nc_event_date'].slice(0, 10)} </strong>
-				<p style="margin-top:0.2rem;margin-bottom:0;">{item['analysis_history']['000'][0]['label'].slice(0, 50)}...</p>
-				</button>
-			</li>
-		{/each}
-	</ul>
-  </div>
+<div style="position:relative;">
+  {#if nonConformitiesFilter.length > 0}
+    <div
+      style="align:right;padding-right:0.5rem;position:absolute;top:2px;right:2px;"
+    >
+      <button
+        style="cursor:pointer;align:right;border:none;background:none;"
+        on:click={() => {
+          nonConformitiesFilter = [];
+          $referencesList = "";
+        }}
+      >
+        <i style="font-size: 0.75rem;" class="fas fa-trash-alt"></i>
+      </button>
+    </div>
+  {/if}
+</div>
+<div class="scrollable">
+  <ul style="list-style-type: none; padding: 0;">
+    {#each $filteredNonConformities as item, index}
+      <li class:selected={$selectItem === item && $activeTabValue === 2}>
+        <button
+          type="button"
+          use:ripple={{
+            color: "rgba(82, 54, 171, 0.2)",
+            duration: 0.6,
+          }}
+          on:click={() => {
+            $selectItem = item;
+          }}
+          on:keypress={(e) => {
+            if (e.key === "Enter") {
+              $selectItem = item;
+            }
+          }}
+          style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;"
+        >
+          <strong
+            >{item["ATA_code"]} - {item["ATA_category"]} - {item[
+              "nc_event_date"
+            ].slice(0, 10)}
+          </strong>
+          <p style="margin-top:0.2rem;margin-bottom:0;">
+            {item["analysis_history"]["000"][0]["label"].slice(
+              0,
+              50,
+            )}...
+          </p>
+        </button>
+      </li>
+    {/each}
+  </ul>
+</div>
 
-  <style>
-    .selected {
-      border-left: 0.25rem solid;
-      background: rgb(230, 227, 243);
-      border-image: linear-gradient(rgb(227, 25, 55), rgb(82, 54, 171)) 0 100% / 1 / 0 stretch;
-    }
-    li {
-      padding: 0;
-      border: none;
-      list-style-type: none;
-      background: rgb(248, 248, 248);
-    }
-    li:hover {
-      background-color: rgb(230, 227, 243);
-    }
-	input {
-		padding: 0.35rem!important;
-		margin-bottom: 1rem;
-		width: 22vw;
-		font-size: 0.9rem;
-	}
-	.scrollable {
-		max-height: 15vh;
-		overflow-y: auto;
-		width:100%;
-	}
+<style>
+  .selected {
+    border-left: 0.25rem solid;
+    background: rgb(230, 227, 243);
+    border-image: linear-gradient(rgb(227, 25, 55), rgb(82, 54, 171)) 0 100% /
+      1 / 0 stretch;
+  }
+  li {
+    padding: 0;
+    border: none;
+    list-style-type: none;
+    background: rgb(248, 248, 248);
+  }
+  li:hover {
+    background-color: rgb(230, 227, 243);
+  }
+  input {
+    padding: 0.35rem !important;
+    margin-bottom: 1rem;
+    width: 22vw;
+    font-size: 0.9rem;
+  }
+  .scrollable {
+    max-height: 15vh;
+    overflow-y: auto;
+    width: 100%;
+  }
 
-	.scrollable::-webkit-scrollbar {
-		width: 12px; /* Width of the scrollbar */
-	}
+  .scrollable::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+  }
 
-	.scrollable::-webkit-scrollbar-track {
-		background: #f1f1f1; /* Background of the scrollbar track */
-	}
+  .scrollable::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+  }
 
-	.scrollable::-webkit-scrollbar-thumb {
-		background: #888; /* Color of the scrollbar thumb */
-		border-radius: 10px; /* Rounded corners for the scrollbar thumb */
-	}
-
-
-  </style>
+  .scrollable::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+  }
+</style>

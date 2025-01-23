@@ -1,29 +1,28 @@
-
 <script>
-  import { scale } from 'svelte/transition'
-  import { ClassBuilder } from './showDocumentClass.js'
-  const classesDefault = 'tooltip'
-  let className = ''
-  export let classes = classesDefault
-  export { className as class }
-  export let show = false
+  import { scale } from "svelte/transition";
+  import { ClassBuilder } from "./showDocumentClass.js";
+  const classesDefault = "tooltip";
+  let className = "";
+  export let classes = classesDefault;
+  export { className as class };
+  export let show = false;
 
-  export let timeout = null
-  const cb = new ClassBuilder(classes, classesDefault)
-  $: c = cb.flush().add(classes, true, classesDefault).add(className).get()
+  export let timeout = null;
+  const cb = new ClassBuilder(classes, classesDefault);
+  $: c = cb.flush().add(classes, true, classesDefault).add(className).get();
   function showTooltip() {
-    if (show) return
-    show = true
-    if (!timeout) return
+    if (show) return;
+    show = true;
+    if (!timeout) return;
     timeout = setTimeout(() => {
-      show = false
-    }, timeout)
+      show = false;
+    }, timeout);
   }
   function hideTooltip() {
-    if (!show) return
+    if (!show) return;
 
-    show = false
-    clearTimeout(timeout)
+    show = false;
+    clearTimeout(timeout);
   }
   /**
    * @param {{ (): void; (): void; apply?: any; }} func
@@ -34,19 +33,19 @@
     /**
      * @type {number}
      */
-    let timeout
+    let timeout;
     return function () {
       let context = this,
-        args = arguments
+        args = arguments;
       let later = function () {
-        timeout = null
-        if (!immediate) func.apply(context, args)
-      }
-      let callNow = immediate && !timeout
-      clearTimeout(timeout)
-      timeout = setTimeout(later, wait)
-      if (callNow) func.apply(context, args)
-    }
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      let callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
   }
 </script>
 

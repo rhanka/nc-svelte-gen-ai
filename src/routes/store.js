@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import { nonConformities } from './non_conformities';
 
-function createLocalStorageStore(key, initialValue, clean=false) {
+function createLocalStorageStore(key, initialValue, clean = false) {
   const storedValue = clean ? null : localStorage.getItem(key);
   const store = writable(storedValue ? JSON.parse(storedValue) : initialValue);
 
@@ -33,7 +33,7 @@ function initialCreatedItem() {
     '500': []
   };
   if (myCreatedItem) {
-    ['000','100','200','300','400','500'].forEach(task => {
+    ['000', '100', '200', '300', '400', '500'].forEach(task => {
       myCreatedItem.analysis_history[task] = history[task];
     });
   }
@@ -44,7 +44,7 @@ function initialCreatedItem() {
     nc_event_id: "ATA-28-xxx",
     role: 'Quality Controler',
     name: "Eric Roy",
-    nc_event_date: (new Date()).toISOString().replace(/T.*/,""),
+    nc_event_date: (new Date()).toISOString().replace(/T.*/, ""),
     analysis_history: {
       "000": history['000'],
       "100": history['100'],
@@ -69,17 +69,17 @@ export function resetCreatedItem() {
   }
 }
 // Crée un store pour stocker les donn�es des �v�nements
-export const createdItem = createLocalStorageStore('createdItem',initialCreatedItem() );
-export const referencesList = createLocalStorageStore('referencesList','' );
+export const createdItem = createLocalStorageStore('createdItem', initialCreatedItem());
+export const referencesList = createLocalStorageStore('referencesList', '');
 export const updateCreatedItem = writable(null);
 export const taskLabel = {
-    "000": "Non-Conformity Report",
-    "100": "Task 100 - Analysis",
-    "200": "Task 200 - Analysis Validation",
-    "300": "Task 300 - Stress Analysis",
-    "400": "Task 400 - Stress Analysis Validation",
-    "500": "Task 500 - Final Analysis Validation"
-  }
+  "000": "Non-Conformity Report",
+  "100": "Task 100 - Analysis",
+  "200": "Task 200 - Analysis Validation",
+  "300": "Task 300 - Stress Analysis",
+  "400": "Task 400 - Stress Analysis Validation",
+  "500": "Task 500 - Final Analysis Validation"
+}
 export const isUpdating = writable(false);
 export const askForHelp = writable(false);
 export const accessToken = createLocalStorageStore('accessToken', '');
@@ -97,7 +97,7 @@ export const activeTabValue = writable(1);
 
 createdItem.subscribe(value => {
   myCreatedItem = value;
-  ['000','100','200','300','400','500'].forEach(task => {
+  ['000', '100', '200', '300', '400', '500'].forEach(task => {
     history[task] = myCreatedItem.analysis_history[task] || [];
   });
 });

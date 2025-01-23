@@ -1,6 +1,6 @@
 <script>
-  import { accessToken } from './store.js';
-  import { createEventDispatcher } from 'svelte';
+  import { accessToken } from "./store.js";
+  import { createEventDispatcher } from "svelte";
 
   export let type = "login"; // "login" ou "register"
 
@@ -8,16 +8,16 @@
 
   $: title = type === "login" ? "Login" : "Register";
 
-  let email = '';
-  let password = '';
-  let confirmPassword = '';
-  let successMessage = ''; // Variable pour stocker le message de succès
-  let errorMessage = ''; // Variable pour stocker le message d'erreur
+  let email = "";
+  let password = "";
+  let confirmPassword = "";
+  let successMessage = ""; // Variable pour stocker le message de succès
+  let errorMessage = ""; // Variable pour stocker le message d'erreur
 
   const handleSubmit = async (event) => {
-    errorMessage = '';
+    errorMessage = "";
     event.preventDefault();
-    successMessage = ''; // Réinitialiser le message de succès
+    successMessage = ""; // Réinitialiser le message de succès
 
     if (type === "register" && password !== confirmPassword) {
       errorMessage = "Passwords do not match"; // Mettre à jour le message d'erreur
@@ -26,12 +26,12 @@
 
     const apiUrl = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/${type}`;
     const response = await fetch(apiUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     });
 
     if (response.ok) {
@@ -40,45 +40,89 @@
       successMessage = "Success"; // Mettre à jour le message de succès
       console.log(`Success ${type}`);
       setTimeout(() => {
-        dispatch('changeView', { view: type === "login" ? 'tabs' : 'login' });
+        dispatch("changeView", { view: type === "login" ? "tabs" : "login" });
       }, 1000);
     } else {
       const data = await response.json();
       errorMessage = `Error ${data.status}: ${data.message}`;
-      console.error('HTTP error', data);
+      console.error("HTTP error", data);
     }
   };
 </script>
 
 <div class="auth-container">
   <h1>{title}</h1>
-  <form on:submit={handleSubmit} on:focus={() => {errorMessage = '';}}>
+  <form
+    on:submit={handleSubmit}
+    on:focus={() => {
+      errorMessage = "";
+    }}
+  >
     <div class="input-group">
       <label for="email">Email</label>
-      <input type="email" id="email" name="email" bind:value={email} required on:focus={() => {errorMessage = '';}} />
+      <input
+        type="email"
+        id="email"
+        name="email"
+        bind:value={email}
+        required
+        on:focus={() => {
+          errorMessage = "";
+        }}
+      />
     </div>
     <div class="input-group">
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" bind:value={password} required on:focus={() => {errorMessage = '';}} />
+      <input
+        type="password"
+        id="password"
+        name="password"
+        bind:value={password}
+        required
+        on:focus={() => {
+          errorMessage = "";
+        }}
+      />
     </div>
     {#if type === "register"}
       <div class="input-group">
         <label for="confirm-password">Confirm Password</label>
-        <input type="password" id="confirm-password" name="confirm-password" bind:value={confirmPassword} required on:focus={() => {errorMessage = '';}} />
+        <input
+          type="password"
+          id="confirm-password"
+          name="confirm-password"
+          bind:value={confirmPassword}
+          required
+          on:focus={() => {
+            errorMessage = "";
+          }}
+        />
       </div>
     {/if}
     <button type="submit">{title}</button>
   </form>
   {#if successMessage}
-    <p class="success-message">{successMessage}</p> <!-- Afficher le message de succès -->
+    <p class="success-message">{successMessage}</p>
+    <!-- Afficher le message de succès -->
   {/if}
   {#if errorMessage}
-    <p class="error-message">{errorMessage}</p> <!-- Afficher le message de succès -->
+    <p class="error-message">{errorMessage}</p>
+    <!-- Afficher le message de succès -->
   {/if}
   {#if type === "login"}
-    <p>No account? <a href="#" on:click|preventDefault={() => type = "register"}>Register here</a></p>
+    <p>
+      No account? <a
+        href="#"
+        on:click|preventDefault={() => (type = "register")}>Register here</a
+      >
+    </p>
   {:else}
-    <p>Already have an account? <a href="#" on:click|preventDefault={() => type = "login"}>Login here</a></p>
+    <p>
+      Already have an account? <a
+        href="#"
+        on:click|preventDefault={() => (type = "login")}>Login here</a
+      >
+    </p>
   {/if}
 </div>
 

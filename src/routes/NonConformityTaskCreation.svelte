@@ -1,54 +1,58 @@
 <script>
-  	import { marked } from 'marked'; // Import the marked library
-	import Input from './Input.svelte';
-	import Dropzone from "svelte-file-dropzone";
-	import { taskLabel, createdItem, isUpdating, askForHelp } from './store.js';
-    import '@fortawesome/fontawesome-free/css/all.css';
+  import { marked } from "marked"; // Import the marked library
+  import Input from "./Input.svelte";
+  import Dropzone from "svelte-file-dropzone";
+  import { taskLabel, createdItem, isUpdating, askForHelp } from "./store.js";
+  import "@fortawesome/fontawesome-free/css/all.css";
 
-	export let aiHelp = false;
+  export let aiHelp = false;
 
-	export let task;
-	export let expand;
-	export let dropzone = false;
+  export let task;
+  export let expand;
+  export let dropzone = false;
 
-	const dict = {
-		aircraft_id: "Aircraft Serial Number",
-		part_id: "Part number",
-		nc_event_date: "Date"
-	}
+  const dict = {
+    aircraft_id: "Aircraft Serial Number",
+    part_id: "Part number",
+    nc_event_date: "Date",
+  };
 
-	const smartLabel = (key) => {
-		return dict[key] ? dict[key] : key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-	}
+  const smartLabel = (key) => {
+    return dict[key]
+      ? dict[key]
+      : key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  };
 
-	let image;
+  let image;
 
-	const step_template = {
-		'000': {
-			label: "<Please provide a short label for non-conformity report>",
-			description: "Please provide a concise and precise description for this task",
-			name: "Eric Roy",
-			role: "Quality Controller",
-			date: (new Date()).toISOString(),
-			previous: null,
-			next: null,
-			validated: false
-		},
-		'100': {
-			label: "<Please provide a short label for non-conformity analysis>",
-			description: "Please provide a concise and precise description for this task",
-			name: "Christine Tremblay",
-			role: "Design Office",
-			date: (new Date()).toISOString(),
-			previous: null,
-			next: null,
-			validated: false
-		}
-	}
+  const step_template = {
+    "000": {
+      label: "<Please provide a short label for non-conformity report>",
+      description:
+        "Please provide a concise and precise description for this task",
+      name: "Eric Roy",
+      role: "Quality Controller",
+      date: new Date().toISOString(),
+      previous: null,
+      next: null,
+      validated: false,
+    },
+    "100": {
+      label: "<Please provide a short label for non-conformity analysis>",
+      description:
+        "Please provide a concise and precise description for this task",
+      name: "Christine Tremblay",
+      role: "Design Office",
+      date: new Date().toISOString(),
+      previous: null,
+      next: null,
+      validated: false,
+    },
+  };
 
-	$: if (expand && $createdItem.analysis_history[task].length === 0) {
-		$createdItem.analysis_history[task][0] = {...step_template[task]};
-	}
+  $: if (expand && $createdItem.analysis_history[task].length === 0) {
+    $createdItem.analysis_history[task][0] = { ...step_template[task] };
+  }
 
   let files = {
     accepted: [],
@@ -59,7 +63,7 @@
     const { acceptedFiles, fileRejections } = e.detail;
     files.accepted = [...files.accepted, ...acceptedFiles];
     files.rejected = [...files.rejected, ...fileRejections];
-	console.log(files.accepted);
+    console.log(files.accepted);
   }
 
   function handleRemoveFile(e, index) {
@@ -71,189 +75,266 @@
   }
 
   function handleClick() {
-	expand = !expand;
-	if (expand) {
-		$createdItem.currentTask = task;
-	}
+    expand = !expand;
+    if (expand) {
+      $createdItem.currentTask = task;
+    }
   }
-
 </script>
 
-
-<div 
-	class="MuiPaper-root MuiPaper-outlined MuiPaper-rounded MuiCard-root"
-	style="margin-bottom: 1rem;"
+<div
+  class="MuiPaper-root MuiPaper-outlined MuiPaper-rounded MuiCard-root"
+  style="margin-bottom: 1rem;"
 >
-	{#if task}
-		<button
-			type="button"
-			on:click={handleClick}
-			on:keypress={(e) => e.key === 'Enter' && handleClick()}
-			class="MuiCardActions-root"
-			style="cursor: pointer; display: flex; padding: 0px; width: 100%; text-align: left; border: none; background: none;"
-		>
-			<h3 class="MuiTypography-root MuiTypography-h3 taskTitle">
-				{taskLabel[task]}
-				{#if aiHelp && expand}
-					<a
-						href="/"
-						on:click|stopPropagation|preventDefault={() => $askForHelp=task}
-						on:keypress={(e) => {if (e.key === 'Enter') {$askForHelp = task}}}
-						class="helper"
-						style="margin-left:1rem;padding-bottom:.2rem;cursor: help; text-decoration:none;"
-					>
-						AI Assitant
-					</a>
-				{/if}
-			</h3>
-			<i class="fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> 
-		</button>
-	{/if}
+  {#if task}
+    <button
+      type="button"
+      on:click={handleClick}
+      on:keypress={(e) => e.key === "Enter" && handleClick()}
+      class="MuiCardActions-root"
+      style="cursor: pointer; display: flex; padding: 0px; width: 100%; text-align: left; border: none; background: none;"
+    >
+      <h3 class="MuiTypography-root MuiTypography-h3 taskTitle">
+        {taskLabel[task]}
+        {#if aiHelp && expand}
+          <a
+            href="/"
+            on:click|stopPropagation|preventDefault={() =>
+              ($askForHelp = task)}
+            on:keypress={(e) => {
+              if (e.key === "Enter") {
+                $askForHelp = task;
+              }
+            }}
+            class="helper"
+            style="margin-left:1rem;padding-bottom:.2rem;cursor: help; text-decoration:none;"
+          >
+            AI Assitant
+          </a>
+        {/if}
+      </h3>
+      <i class="fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
+    </button>
+  {/if}
 
-	{#if expand}
-		<div class="container">
-			<div class="left-column {$isUpdating === task ? 'gradiant' : ''}">
-				{#if $createdItem.analysis_history[task] && $createdItem.analysis_history[task].length}
-					{#each $createdItem.analysis_history[task] as step}
-							<h4><Input bind:value={step.label} label="Label"/> - <Input bind:value={step.date} label="Date"/> </h4>
+  {#if expand}
+    <div class="container">
+      <div class="left-column {$isUpdating === task ? 'gradiant' : ''}">
+        {#if $createdItem.analysis_history[task] && $createdItem.analysis_history[task].length}
+          {#each $createdItem.analysis_history[task] as step}
+            <h4>
+              <Input bind:value={step.label} label="Label" /> - <Input
+                bind:value={step.date}
+                label="Date"
+              />
+            </h4>
 
-							<Input label="Role" bind:value={step['role']}/> -
-							<Input label="Author" bind:value={step['name']}/>
+            <Input label="Role" bind:value={step["role"]} /> -
+            <Input label="Author" bind:value={step["name"]} />
 
-							<br><br>
-							<div>
-								{#if typeof step.description === 'string'}
-									<Input
-										bind:value={step.description}
-										label="Description"
-										markdown={true}
-									/>
-								{:else if typeof step.description === 'object'}
-									{#each Object.entries(step.description) as [key, value]}
-										{#if Array.isArray(value)}
-											<Input
-											value={JSON.stringify(step.description[key])}
-											label={key}
-											markdown={true}
-											/>
-										{:else if typeof step.description[key] === 'string'}
-											<h4>{smartLabel(key)}</h4>
-											<Input
-											bind:value={step.description[key]}
-											markdown={true}
-											/>
-										{:else if typeof step.description === 'object'}
-											<h4>{smartLabel(key)}</h4>
-											<ul style="margin-top:0;padding-top:0;padding-bottom:0">
-											{#each Object.entries(step.description[key]) as [key2, value2]}
-												<li style="padding:0"><strong>{smartLabel(key2)}: &nbsp</strong><Input
-												bind:value={step.description[key][key2]}
-												/>
-												</li>
-											{/each}
-											</ul>
-										{/if}
-									{/each}
-								{/if}
-							</div>
-					{/each}
-				{/if}
-			</div>
-			<div class="right-column">
-				{#if dropzone}
-						{#if files.accepted.length > 0}
-							<div class="image-preview">
-								{#each files.accepted as file, index}
-									<div class="img-container">
-										<img
-											src={URL.createObjectURL(file)}
-											alt={`Preview of ${file.name}`}
-											class="preview-img"
-										/>
-										<br>
-										<button on:click={() => handleRemoveFile(null, index)}>Remove</button>
-									</div>
-								{/each}
-							</div>
-						{:else}
-							<Dropzone on:drop={handleFilesSelect} accept={["image/*"]}>
-							Drag 'n' drop some image here, or click to select files
-							</Dropzone>
-						{/if}
-					{/if}
-			</div>
-			<div class="icon-bar-wrapper">
-				<div class="icon-bar">
-					<button
-						on:click={() => $createdItem.analysis_history[task][0].validated = !$createdItem.analysis_history[task][0].validated}
-						aria-label="Validate"
-					>
-						<i class="fas fa-check" style="color: {$createdItem.analysis_history[task][0].validated ? 'green;' : '#bbb'}" title="Valider"></i>
-					</button>
-					<button
-						on:click={() => {
-							$createdItem.analysis_history[task][0].redo = $createdItem.analysis_history[task][0]
-							$createdItem.analysis_history[task][0] = $createdItem.analysis_history[task][0].undo
-						}}
-						aria-label="Undo"
-					>
-						<i class="fas fa-undo" title="Undo"></i>
-					</button>
-					<button
-						on:click={() => {
-							if ($createdItem.analysis_history[task][0].redo) {
-								$createdItem.analysis_history[task][0].undo = $createdItem.analysis_history[task][0]
-								$createdItem.analysis_history[task][0] = $createdItem.analysis_history[task][0].redo
-							} else {
-								$askForHelp = task
-							}
-						}}
-						aria-label="{$createdItem.analysis_history[task][0].redo ? 'Redo' : 'Retry'}"
-					>
-						<i class="fas fa-redo" title="{$createdItem.analysis_history[task][0].redo ? 'Redo' : 'Retry'}"></i>
-					</button>
-					<button
-						on:click={() => {
-							if ($createdItem.analysis_history[task][0].feedback === "positive") {
-								$createdItem.analysis_history[task][0].feedback = null
-							} else {
-								$createdItem.analysis_history[task][0].feedback = "positive"
-							}
-						}}
-						aria-label="Helpful"
-					>
-						<i
-							class="fa{$createdItem.analysis_history[task][0].feedback === 'positive' ? 's' : 'r'} fa-thumbs-up"
-							style="color: {$createdItem.analysis_history[task][0].feedback === "positive" ? 'black' : '#aaa'}"
-							title="Helpful"
-						></i>
-					</button>
-					<button
-						on:click={() => {
-							if ($createdItem.analysis_history[task][0].feedback === "negative") {
-								$createdItem.analysis_history[task][0].feedback = null
-							} else {
-								$createdItem.analysis_history[task][0].feedback = "negative"
-							}
-						}}
-						aria-label="Not Helpful, Useless or Harmful"
-					>
-						<i
-							class="fa{$createdItem.analysis_history[task][0].feedback === 'negative' ? 's' : 'r'} fa-thumbs-down"
-							style="color: {$createdItem.analysis_history[task][0].feedback === "negative" ? 'black' : '#aaa'}"
-							title="Not Helpful, Useless or Harmful"></i>
-					</button>
-				</div>
-			</div>
-		</div>
-	{/if}
-
+            <br /><br />
+            <div>
+              {#if typeof step.description === "string"}
+                <Input
+                  bind:value={step.description}
+                  label="Description"
+                  markdown={true}
+                />
+              {:else if typeof step.description === "object"}
+                {#each Object.entries(step.description) as [key, value]}
+                  {#if Array.isArray(value)}
+                    <Input
+                      value={JSON.stringify(
+                        step.description[key],
+                      )}
+                      label={key}
+                      markdown={true}
+                    />
+                  {:else if typeof step.description[key] === "string"}
+                    <h4>{smartLabel(key)}</h4>
+                    <Input
+                      bind:value={step.description[key]}
+                      markdown={true}
+                    />
+                  {:else if typeof step.description === "object"}
+                    <h4>{smartLabel(key)}</h4>
+                    <ul
+                      style="margin-top:0;padding-top:0;padding-bottom:0"
+                    >
+                      {#each Object.entries(step.description[key]) as [key2, value2]}
+                        <li style="padding:0">
+                          <strong
+                            >{smartLabel(key2)}:
+                            &nbsp</strong
+                          ><Input
+                            bind:value={step
+                              .description[key][
+                              key2
+                            ]}
+                          />
+                        </li>
+                      {/each}
+                    </ul>
+                  {/if}
+                {/each}
+              {/if}
+            </div>
+          {/each}
+        {/if}
+      </div>
+      <div class="right-column">
+        {#if dropzone}
+          {#if files.accepted.length > 0}
+            <div class="image-preview">
+              {#each files.accepted as file, index}
+                <div class="img-container">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`Preview of ${file.name}`}
+                    class="preview-img"
+                  />
+                  <br />
+                  <button
+                    on:click={() =>
+                      handleRemoveFile(null, index)}
+                    >Remove</button
+                  >
+                </div>
+              {/each}
+            </div>
+          {:else}
+            <Dropzone
+              on:drop={handleFilesSelect}
+              accept={["image/*"]}
+            >
+              Drag 'n' drop some image here, or click to select
+              files
+            </Dropzone>
+          {/if}
+        {/if}
+      </div>
+      <div class="icon-bar-wrapper">
+        <div class="icon-bar">
+          <button
+            on:click={() =>
+              ($createdItem.analysis_history[task][0].validated =
+                !$createdItem.analysis_history[task][0]
+                  .validated)}
+            aria-label="Validate"
+          >
+            <i
+              class="fas fa-check"
+              style="color: {$createdItem.analysis_history[
+                task
+              ][0].validated
+                ? 'green;'
+                : '#bbb'}"
+              title="Valider"
+            ></i>
+          </button>
+          <button
+            on:click={() => {
+              $createdItem.analysis_history[task][0].redo =
+                $createdItem.analysis_history[task][0];
+              $createdItem.analysis_history[task][0] =
+                $createdItem.analysis_history[task][0].undo;
+            }}
+            aria-label="Undo"
+          >
+            <i class="fas fa-undo" title="Undo"></i>
+          </button>
+          <button
+            on:click={() => {
+              if ($createdItem.analysis_history[task][0].redo) {
+                $createdItem.analysis_history[task][0].undo =
+                  $createdItem.analysis_history[task][0];
+                $createdItem.analysis_history[task][0] =
+                  $createdItem.analysis_history[task][0].redo;
+              } else {
+                $askForHelp = task;
+              }
+            }}
+            aria-label={$createdItem.analysis_history[task][0].redo
+              ? "Redo"
+              : "Retry"}
+          >
+            <i
+              class="fas fa-redo"
+              title={$createdItem.analysis_history[task][0].redo
+                ? "Redo"
+                : "Retry"}
+            ></i>
+          </button>
+          <button
+            on:click={() => {
+              if (
+                $createdItem.analysis_history[task][0]
+                  .feedback === "positive"
+              ) {
+                $createdItem.analysis_history[
+                  task
+                ][0].feedback = null;
+              } else {
+                $createdItem.analysis_history[
+                  task
+                ][0].feedback = "positive";
+              }
+            }}
+            aria-label="Helpful"
+          >
+            <i
+              class="fa{$createdItem.analysis_history[task][0]
+                .feedback === 'positive'
+                ? 's'
+                : 'r'} fa-thumbs-up"
+              style="color: {$createdItem.analysis_history[
+                task
+              ][0].feedback === 'positive'
+                ? 'black'
+                : '#aaa'}"
+              title="Helpful"
+            ></i>
+          </button>
+          <button
+            on:click={() => {
+              if (
+                $createdItem.analysis_history[task][0]
+                  .feedback === "negative"
+              ) {
+                $createdItem.analysis_history[
+                  task
+                ][0].feedback = null;
+              } else {
+                $createdItem.analysis_history[
+                  task
+                ][0].feedback = "negative";
+              }
+            }}
+            aria-label="Not Helpful, Useless or Harmful"
+          >
+            <i
+              class="fa{$createdItem.analysis_history[task][0]
+                .feedback === 'negative'
+                ? 's'
+                : 'r'} fa-thumbs-down"
+              style="color: {$createdItem.analysis_history[
+                task
+              ][0].feedback === 'negative'
+                ? 'black'
+                : '#aaa'}"
+              title="Not Helpful, Useless or Harmful"
+            ></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
   li {
     padding: 1rem;
-	transition: width 0.3s;
+    transition: width 0.3s;
   }
 
   /* Conteneur global */
@@ -265,29 +346,30 @@
 
   /* Colonne de gauche */
   .left-column {
-	padding-right: 0.5rem;
+    padding-right: 0.5rem;
     flex: 2; /* 2/3 de l'espace disponible */
     min-width: 200px; /* Largeur minimale pour �viter un �crasement trop important */
   }
 
   /* Colonne de droite */
   .right-column {
-	padding-top: 2rem;
+    padding-top: 2rem;
     flex: 1; /* 1/3 de l'espace disponible */
     min-width: 200px; /* Largeur minimale pour �viter un �crasement trop important */
   }
 
   h4 {
-    padding-top:0.5rem;
-    padding-bottom:0;
-    margin-top:0;
-    margin-bottom:0;
+    padding-top: 0.5rem;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
   }
-  ul,li{
-    padding-top:0;
-    padding-bottom:0;
-    margin-top:0;
-    margin-bottom:0;
+  ul,
+  li {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   .helper {
@@ -303,7 +385,7 @@
   }
 
   .helper:hover {
-	background-color: #5236ab;
+    background-color: #5236ab;
     color: #fff;
     text-decoration: none;
     border-color: #5236ab;
@@ -325,11 +407,11 @@
   }
 
   .img-container {
-		display: flex;
+    display: flex;
     flex-direction: column;
     align-items: center; /* Centre horizontalement */
     width: 100%;
-	}
+  }
   .preview-img {
     max-width: 100%;
     max-height: 200px;
@@ -337,10 +419,10 @@
     border: 1px solid #ddd;
     border-radius: 4px;
   }
- button {
+  button {
     margin-top: 0.5rem;
-		border: none;
-		background: #eee;
+    border: none;
+    background: #eee;
     cursor: pointer;
   }
 
@@ -348,23 +430,31 @@
     background: #e9e9e9;
   }
 
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 100% 50%;
+    }
+  }
 
-	@keyframes gradient {
-		0% {
-		background-position: 0% 50%;
-		}
-		100% {
-		background-position: 100% 50%;
-		}
-	}
-
-	.gradiant {
-		background: linear-gradient(90deg, #333, #666, #aaa, #eee, #aaa, #555, #222);
-    	background-size: 400% 100%; /* Assurez-vous que le gradient est assez large pour bouger */
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		animation: gradient 1.5s infinite linear;
-	}
+  .gradiant {
+    background: linear-gradient(
+      90deg,
+      #333,
+      #666,
+      #aaa,
+      #eee,
+      #aaa,
+      #555,
+      #222
+    );
+    background-size: 400% 100%; /* Assurez-vous que le gradient est assez large pour bouger */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient 1.5s infinite linear;
+  }
 
   .icon-bar-wrapper {
     display: flex;
@@ -376,24 +466,26 @@
 
   .icon-bar {
     display: flex;
-	justify-content: center;
+    justify-content: center;
     gap: 1rem;
     margin-top: 1rem;
     padding: 1rem;
-	padding-bottom:0;
+    padding-bottom: 0;
   }
 
   .icon-bar button {
-	cursor: pointer;
-	border: none;
-	background: none;
-	margin: 0;
+    cursor: pointer;
+    border: none;
+    background: none;
+    margin: 0;
   }
   .icon-bar i {
     font-size: 1rem;
     cursor: pointer;
     color: #bbb;
-    transition: color 0.2s ease, transform 0.2s ease;
+    transition:
+      color 0.2s ease,
+      transform 0.2s ease;
   }
 
   .icon-bar i:hover {
@@ -402,18 +494,22 @@
   }
 
   .taskTitle {
-		margin: 0px;
-		margin-bottom: 1rem;
-		font-family: "Source Sans Pro", -apple-system, sans-serif, Arial;
-		line-height: 1.167;
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: rgb(51, 51, 51);
-		flex: 1 1 auto;
-	}
+    margin: 0px;
+    margin-bottom: 1rem;
+    font-family:
+      "Source Sans Pro",
+      -apple-system,
+      sans-serif,
+      Arial;
+    line-height: 1.167;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: rgb(51, 51, 51);
+    flex: 1 1 auto;
+  }
 
   .MuiPaper-root {
-	background-color: rgb(255, 255, 255);
+    background-color: rgb(255, 255, 255);
     color: rgb(51, 51, 51);
     box-shadow: rgb(232, 232, 232) 0px 4px inset;
     transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -424,12 +520,11 @@
     border-color: rgb(232, 232, 232);
     border-image: initial;
     padding: 2rem;
-}
-.MuiCardActions-root {
-	display: flex;
-	-webkit-box-align: center;
-	align-items: center;
-	padding: 0px;
-}
+  }
+  .MuiCardActions-root {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    padding: 0px;
+  }
 </style>
-

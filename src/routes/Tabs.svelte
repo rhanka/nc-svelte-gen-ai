@@ -1,20 +1,20 @@
 <script>
-  import Menu from './Menu.svelte';
-  import AuthForm from './AuthForm.svelte';
-  import { activeTabValue } from './store.js'
-	import "svelte-ripple-action/ripple.css"
-	import { ripple } from "svelte-ripple-action";
+  import Menu from "./Menu.svelte";
+  import AuthForm from "./AuthForm.svelte";
+  import { activeTabValue } from "./store.js";
+  import "svelte-ripple-action/ripple.css";
+  import { ripple } from "svelte-ripple-action";
 
   export let items = [];
-  let currentView = 'tabs';
+  let currentView = "tabs";
 
-  const handleClick = tabValue => () => ($activeTabValue = tabValue);
+  const handleClick = (tabValue) => () => ($activeTabValue = tabValue);
 
   function handleChangeView(event) {
     currentView = event.detail.view;
   }
 
-  $: items.forEach(item => {
+  $: items.forEach((item) => {
     if (item.active) {
       item.loaded = true;
     }
@@ -28,24 +28,27 @@
     <div class="MuiBox-root tab-root">
       <div class="MuiTabs-flexContainer tab-container">
         <div class="MuiTabs-scroller MuiTabs-fixed tab-scroller">
-          <div aria-label="Tabs" class="MuiTabs-flexContainer tab-container" role="tablist">
+          <div
+            aria-label="Tabs"
+            class="MuiTabs-flexContainer tab-container"
+            role="tablist"
+          >
             {#each items as item}
-                <button
-                  use:ripple={{color: "rgba(82, 54, 171, 0.2)", duration: 0.6}}
-                  class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary tab"
-                  class:Mui-selected = {item.value === $activeTabValue}
-                  class:tab-selected = {item.value === $activeTabValue}
-                  class:inactive = {item.value !== $activeTabValue}
-                  on:click={handleClick(item.value)}
-                  on:keypress={(e) => e.key === 'Enter' && handleClick(item)}
-                  disabled={!item.active}
-                >
-                  {item.label}
-                  <span class="MuiTouchRipple-root Ripple"></span>
-                </button>
+              <button
+                use:ripple={{ color: "rgba(82, 54, 171, 0.2)", duration: 0.6 }}
+                class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary tab"
+                class:Mui-selected={item.value === $activeTabValue}
+                class:tab-selected={item.value === $activeTabValue}
+                class:inactive={item.value !== $activeTabValue}
+                on:click={handleClick(item.value)}
+                on:keypress={(e) => e.key === "Enter" && handleClick(item)}
+                disabled={!item.active}
+              >
+                {item.label}
+                <span class="MuiTouchRipple-root Ripple"></span>
+              </button>
             {/each}
             <span class="tab-container"></span>
-
           </div>
           <span class="tab-underline"></span>
         </div>
@@ -53,11 +56,14 @@
     </div>
   </div>
   <div class="content">
-    {#if currentView === 'tabs'}
+    {#if currentView === "tabs"}
       {#each items as item}
         {#if item.loaded}
-          <div class="box" style="display: {$activeTabValue == item.value ? 'block' : 'none'}">
-            <svelte:component this={item.component} {...item.arguments}/>
+          <div
+            class="box"
+            style="display: {$activeTabValue == item.value ? 'block' : 'none'}"
+          >
+            <svelte:component this={item.component} {...item.arguments} />
           </div>
         {/if}
       {/each}
@@ -91,8 +97,8 @@
 
   .tab-underline {
     position: absolute;
-    top:-4px;
-    width:100%;
+    top: -4px;
+    width: 100%;
     height: calc(100%);
     border-bottom: 4px solid rgb(233, 235, 237);
   }
@@ -103,10 +109,9 @@
     width: 100%;
   }
   .tab-selected {
-    color: rgb(82, 54, 171)!important;
-    border-bottom: 4px solid rgb(82, 54, 171)!important;
+    color: rgb(82, 54, 171) !important;
+    border-bottom: 4px solid rgb(82, 54, 171) !important;
   }
-
 
   .tab {
     z-index: 1;
@@ -127,7 +132,11 @@
     vertical-align: middle;
     appearance: none;
     text-decoration: none;
-    font-family: "Source Sans Pro", -apple-system, sans-serif, Arial;
+    font-family:
+      "Source Sans Pro",
+      -apple-system,
+      sans-serif,
+      Arial;
     line-height: 1.25;
     max-width: 360px;
     position: relative;
@@ -168,7 +177,6 @@
   .box {
     margin-bottom: 10px;
     padding: 0px;
-    border-radius: 0 0 .5rem .5rem;
+    border-radius: 0 0 0.5rem 0.5rem;
   }
-
 </style>
