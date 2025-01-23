@@ -374,21 +374,22 @@
 
   .helper {
     display: inline-block;
-    background-color: #fff;
-    -webkit-transition: all 0.2s ease;
-    transition: all 0.2s ease;
-    padding: 3px 15px;
+	transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1), border-color 250ms cubic-bezier(0.4, 0, 0.2, 1), color 250ms cubic-bezier(0.4, 0, 0.2, 1);    padding: 3px 15px;
     font-size: 15px;
     border-radius: 20px;
-    color: #151515;
-    border: 1px solid #bbb;
+	color: rgb(255, 255, 255);
+    background-color: rgb(82, 54, 171);
+	border-width: 0px;
+    border-style: initial;
+    border-color: initial;
+    border-image: initial;
+	box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 3px 1px, rgba(0, 0, 0, 0.3) 0px 1px 2px 0px;
   }
 
   .helper:hover {
-    background-color: #5236ab;
-    color: #fff;
-    text-decoration: none;
-    border-color: #5236ab;
+	background-color: rgb(203, 195, 230);
+    color: rgb(32, 10, 88);
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
   }
 
   /* Gestion des colonnes en mode responsive */
