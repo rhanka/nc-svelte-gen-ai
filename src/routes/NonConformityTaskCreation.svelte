@@ -496,7 +496,7 @@
 
   .taskTitle {
     margin: 0px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     font-family:
       "Source Sans Pro",
       -apple-system,
