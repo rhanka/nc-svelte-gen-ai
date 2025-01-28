@@ -106,7 +106,6 @@
     display: block;
     font-size: 0.5rem;
     font-weight: 100; /* Police fine */
-    font-family: "Helvetica Neue", Arial, sans-serif; /* Typographie moderne et l�g�re */
 
     color: #555;
     margin-bottom: 0rem;
