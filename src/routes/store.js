@@ -94,6 +94,7 @@ export const defaultAction = writable("Propose task description");
 export const selectDoc = writable(null);
 export const selectItem = writable(null);
 export const activeTabValue = writable(1);
+export const showChatbot = writable(false);
 
 createdItem.subscribe(value => {
   myCreatedItem = value;

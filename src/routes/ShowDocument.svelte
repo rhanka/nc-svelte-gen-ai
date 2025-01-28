@@ -3,6 +3,7 @@
 
   import * as pdfjs from "pdfjs-dist";
   import { onDestroy, tick } from "svelte";
+  import Icon from "@iconify/svelte";
   import {
     calcRT,
     getPageText,
@@ -239,19 +240,12 @@
 </script>
 
 <svelte:window bind:innerWidth={pageWidth} bind:innerHeight={pageHeight} />
+{#if loaded}
+
 <div class="parent">
   <div class={showBorder === true ? "control" : "null"}>
     {#if passwordError === true}
-      <div class="password-viewer">
-        <p>This document requires a password to open:</p>
-        <p class="password-message">{passwordMessage}</p>
-        <div class="password-container">
-          <input type="password" class="password-input" bind:value={password} />
-          <button on:click={onPasswordSubmit} class="password-button">
-            Submit
-          </button>
-        </div>
-      </div>
+
     {:else if showButtons.length}
       <div class="control-start">
         <div class="line">
@@ -515,13 +509,7 @@
           </span>
         </div>
         <div class={showBorder === true ? "viewer" : "null"}>
-          {#if loaded}
             <canvas bind:this={canvas} width={pageWidth} height={pageHeight} />
-          {:else}
-            <div class="loader">
-              <i class="fas fa-spinner fa-spin"></i> Chargement...
-            </div>
-          {/if}
         </div>
       </div>
     {:else}
@@ -540,6 +528,17 @@
     </button>
   {/if}
 </div>
+
+{:else if url}
+<div class="loader">
+    <Icon icon="svg-spinners:ring-resize" height="2rem" style="margin:0.5rem;"/>
+    Loading...
+</div>
+{:else}
+<div class="loader">
+    Please select a document...
+</div>
+{/if}
 
 <style>
   :global(html) {

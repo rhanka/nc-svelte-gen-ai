@@ -3,7 +3,7 @@
   import Input from "./Input.svelte";
   import Dropzone from "svelte-file-dropzone";
   import { taskLabel, createdItem, isUpdating, askForHelp } from "./store.js";
-  import "@fortawesome/fontawesome-free/css/all.css";
+  import Icon from "@iconify/svelte";
 
   export let aiHelp = false;
 
@@ -27,7 +27,7 @@
 
   const step_template = {
     "000": {
-      label: "<Please provide a short label for non-conformity report>",
+      label: "<Label for non-conformity report>",
       description:
         "Please provide a concise and precise description for this task",
       name: "Eric Roy",
@@ -113,7 +113,7 @@
           </a>
         {/if}
       </h3>
-      <i class="fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
+	  <Icon icon="mdi:chevron-{expand ? 'up' : 'down'}" height={24}/>
     </button>
   {/if}
 
@@ -123,11 +123,12 @@
         {#if $createdItem.analysis_history[task] && $createdItem.analysis_history[task].length}
           {#each $createdItem.analysis_history[task] as step}
             <h4>
-              <Input bind:value={step.label} label="Label" /> - <Input
-                bind:value={step.date}
-                label="Date"
-              />
-            </h4>
+              <Input bind:value={step.label} label="Label" />
+			</h4>
+			<Input
+			bind:value={step.date}
+			label="Date"
+			/>
 
             <Input label="Role" bind:value={step["role"]} /> -
             <Input label="Author" bind:value={step["name"]} />
@@ -193,7 +194,6 @@
                     alt={`Preview of ${file.name}`}
                     class="preview-img"
                   />
-                  <br />
                   <button
                     on:click={() =>
                       handleRemoveFile(null, index)}
@@ -207,8 +207,10 @@
               on:drop={handleFilesSelect}
               accept={["image/*"]}
             >
-              Drag 'n' drop some image here, or click to select
-              files
+			 <div style="height:200px;align-items:center;display:flex;justify-content:center;">
+				Drag 'n' drop some image here, or click to select
+				files
+			  </div>
             </Dropzone>
           {/if}
         {/if}
@@ -222,15 +224,7 @@
                   .validated)}
             aria-label="Validate"
           >
-            <i
-              class="fas fa-check"
-              style="color: {$createdItem.analysis_history[
-                task
-              ][0].validated
-                ? 'green;'
-                : '#bbb'}"
-              title="Valider"
-            ></i>
+		  	<Icon class="Icon" icon="mdi:check" height={24} style="color: {$createdItem.analysis_history[task][0].validated ? 'green' : '#bbb'}"/>
           </button>
           <button
             on:click={() => {
@@ -241,7 +235,11 @@
             }}
             aria-label="Undo"
           >
-            <i class="fas fa-undo" title="Undo"></i>
+		  	<Icon
+				class="Icon"
+				icon="mdi:undo"
+				height={24}
+			/>
           </button>
           <button
             on:click={() => {
@@ -258,12 +256,11 @@
               ? "Redo"
               : "Retry"}
           >
-            <i
-              class="fas fa-redo"
-              title={$createdItem.analysis_history[task][0].redo
-                ? "Redo"
-                : "Retry"}
-            ></i>
+		  	<Icon
+				class="Icon"
+				icon="mdi:redo"
+				height={24}
+			/>
           </button>
           <button
             on:click={() => {
@@ -282,18 +279,11 @@
             }}
             aria-label="Helpful"
           >
-            <i
-              class="fa{$createdItem.analysis_history[task][0]
-                .feedback === 'positive'
-                ? 's'
-                : 'r'} fa-thumbs-up"
-              style="color: {$createdItem.analysis_history[
-                task
-              ][0].feedback === 'positive'
-                ? 'black'
-                : '#aaa'}"
-              title="Helpful"
-            ></i>
+		  	<Icon class="Icon"
+				icon="mdi:thumb-up{$createdItem.analysis_history[task][0].feedback === 'positive' ? '' : '-outline'}"
+				height={24}
+				style="color: {$createdItem.analysis_history[task][0].feedback === 'positive' ? 'black' : '#aaa'}"
+			/>
           </button>
           <button
             on:click={() => {
@@ -312,18 +302,11 @@
             }}
             aria-label="Not Helpful, Useless or Harmful"
           >
-            <i
-              class="fa{$createdItem.analysis_history[task][0]
-                .feedback === 'negative'
-                ? 's'
-                : 'r'} fa-thumbs-down"
-              style="color: {$createdItem.analysis_history[
-                task
-              ][0].feedback === 'negative'
-                ? 'black'
-                : '#aaa'}"
-              title="Not Helpful, Useless or Harmful"
-            ></i>
+			<Icon class="Icon"
+				icon="mdi:thumb-down{$createdItem.analysis_history[task][0].feedback === 'negative' ? '' : '-outline'}"
+				height={24}
+				style="color: {$createdItem.analysis_history[task][0].feedback === 'negative' ? 'black' : '#aaa'}"
+			/>
           </button>
         </div>
       </div>
@@ -353,8 +336,13 @@
 
   /* Colonne de droite */
   .right-column {
-    padding-top: 2rem;
     flex: 1; /* 1/3 de l'espace disponible */
+    min-width: 200px; /* Largeur minimale pour �viter un �crasement trop important */
+  }
+
+  .full {
+    padding-right: 0.5rem;
+    width: 100%; /* 2/3 de l'espace disponible */
     min-width: 200px; /* Largeur minimale pour �viter un �crasement trop important */
   }
 
@@ -404,7 +392,7 @@
   }
 
   .image-preview {
-    margin-top: 1rem;
+    margin-top: 0rem;
   }
 
   .img-container {
@@ -416,7 +404,6 @@
   .preview-img {
     max-width: 100%;
     max-height: 200px;
-    margin-bottom: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 4px;
   }
@@ -441,20 +428,7 @@
   }
 
   .gradiant {
-    background: linear-gradient(
-      90deg,
-      #333,
-      #666,
-      #aaa,
-      #eee,
-      #aaa,
-      #555,
-      #222
-    );
-    background-size: 400% 100%; /* Assurez-vous que le gradient est assez large pour bouger */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradient 1.5s infinite linear;
+	color: grey!important;
   }
 
   .icon-bar-wrapper {
@@ -477,19 +451,25 @@
   .icon-bar button {
     cursor: pointer;
     border: none;
-    background: none;
+    background: #fff;
+	padding-top: 0.3rem;
+	padding-bottom: 0.1rem;
     margin: 0;
-  }
-  .icon-bar i {
-    font-size: 1rem;
-    cursor: pointer;
     color: #bbb;
     transition:
       color 0.2s ease,
       transform 0.2s ease;
   }
+  .Icon {
+    font-size: 1rem;
+    cursor: pointer;
+  }
 
-  .icon-bar i:hover {
+  .icon-bar button:hover {
+	border-radius: 50%;
+	padding-top: 0.3rem;
+	padding-bottom: 0.1rem;
+    filter: drop-shadow(rgba(104, 114, 116, 0.267) 0px 2px 5px);
     color: black;
     transform: scale(1.1);
   }

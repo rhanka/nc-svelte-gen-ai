@@ -4,6 +4,7 @@
   export let selectedItem;
 </script>
 
+{#if selectedItem}
 <div
   class="non-conformity-detail"
   style="padding-left: 16px;padding-right: 8px; background-color: #f9f9f9;"
@@ -32,6 +33,7 @@
     ></NonConformityTask>
   {/each}
 </div>
+{/if}
 
 <style>
   li:hover {

@@ -1,6 +1,6 @@
 <script>
   import { marked } from "marked"; // Import the marked library
-  import "@fortawesome/fontawesome-free/css/all.css";
+  import Icon from "@iconify/svelte";
   import { taskLabel } from "./store.js";
   export let task;
   export let history;
@@ -70,7 +70,7 @@
       <h3 class="MuiTypography-root MuiTypography-h3 taskTitle">
         {taskLabel[task]}
       </h3>
-      <i class="fas {expand ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
+	  <Icon icon="mdi:chevron-{expand ? 'up' : 'down'}" height={24}/>
     </button>
   {/if}
   {#if history && expand}
