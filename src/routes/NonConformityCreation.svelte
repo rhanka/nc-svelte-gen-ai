@@ -1,5 +1,4 @@
 <script>
-  import NonConformityTask from "./NonConformityTask.svelte";
   import NonConformityTaskCreation from "./NonConformityTaskCreation.svelte";
   import Input from "./Input.svelte";
   import {
@@ -7,9 +6,7 @@
     createdItem,
     updateCreatedItem,
   } from "./store.js";
-  import { onMount } from "svelte";
-  import { on } from "svelte/events";
-  import "@fortawesome/fontawesome-free/css/all.css";
+  import Icon from '@iconify/svelte';
 
   let taskMask = null;
 
@@ -70,8 +67,7 @@
           style="cursor:pointer;align:right;border:none;background:none;"
           on:click={resetCreatedItem}
         >
-          <i style="font-size: 1rem;" class="fas fa-trash-alt"></i>
-          <!-- Logout icon -->
+		  <Icon icon="mdi:trash-can-outline" height={24}/>
         </button>
       </div>
     </h2>
