@@ -1,5 +1,5 @@
 <script>
-    import "@fortawesome/fontawesome-free/css/all.css";
+    import Icon from "@iconify/svelte";
     export let expand = false;
 </script>
 
@@ -16,11 +16,7 @@
                     expand = !expand;
                 }}
             >
-                <i
-                    style="width: 18px"
-                    class="fas {expand ? 'fa-close' : 'fa-bars'}"
-                ></i>
-                <!-- Logout icon -->
+                <Icon icon="mdi:{expand ? 'close' : 'menu'}" height={18} />
             </button>
 
             <div class="MuiTypography-root MuiTypography-body1">
