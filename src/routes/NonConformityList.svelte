@@ -6,8 +6,8 @@
     activeTabValue,
     selectItem,
   } from "./store.js";
-  import "svelte-ripple-action/ripple.css";
   import { ripple } from "svelte-ripple-action";
+  import Icon from '@iconify/svelte';
 
   export let nonConformities = [];
   export let num = 0;
@@ -44,16 +44,16 @@
 <div style="position:relative;">
   {#if nonConformitiesFilter.length > 0}
     <div
-      style="align:right;padding-right:0.5rem;position:absolute;top:2px;right:2px;"
+      style="display:flex;align-items:right;flex-direction: row-reverse;padding:0.2rem;    background: rgb(248, 248, 248);"
     >
       <button
-        style="cursor:pointer;align:right;border:none;background:none;"
+        style="cursor:pointer;align:right;border:none;padding-top:0.2rem;background:none;"
         on:click={() => {
           nonConformitiesFilter = [];
           $referencesList = "";
         }}
       >
-        <i style="font-size: 0.75rem;" class="fas fa-trash-alt"></i>
+		<Icon icon="mdi:trash-can-outline" height="1rem"/>
       </button>
     </div>
   {/if}
@@ -76,7 +76,7 @@
               $selectItem = item;
             }
           }}
-          style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;"
+          style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;border-bottom: 1px solid rgba(0,0,0,.1)"
         >
           <strong
             >{item["ATA_code"]} - {item["ATA_category"]} - {item[
@@ -84,10 +84,7 @@
             ].slice(0, 10)}
           </strong>
           <p style="margin-top:0.2rem;margin-bottom:0;">
-            {item["analysis_history"]["000"][0]["label"].slice(
-              0,
-              50,
-            )}...
+            {item["analysis_history"]["000"][0]["label"]}
           </p>
         </button>
       </li>
@@ -106,7 +103,7 @@
     padding: 0;
     border: none;
     list-style-type: none;
-    background: rgb(248, 248, 248);
+	border-left: 0.25rem solid rgb(0,0,0,0);
   }
   li:hover {
     background-color: rgb(230, 227, 243);
@@ -118,9 +115,9 @@
     font-size: 0.9rem;
   }
   .scrollable {
-    max-height: 15vh;
     overflow-y: auto;
     width: 100%;
+	background: rgb(248, 248, 248);
   }
 
   .scrollable::-webkit-scrollbar {
