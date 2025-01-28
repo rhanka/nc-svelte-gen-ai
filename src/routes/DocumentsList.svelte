@@ -4,34 +4,31 @@
   import {
     referencesList,
     selectDoc,
-    selectItem,
     activeTabValue,
   } from "./store";
-  import "svelte-ripple-action/ripple.css";
   import { ripple } from "svelte-ripple-action";
+  import Icon from '@iconify/svelte';
 
   export let documentsList = [];
   const dispatch = createEventDispatcher();
   let searchQuery = "";
 </script>
 
-<div style="position:relative;">
   {#if documentsList.length > 0}
     <div
-      style="align:right;padding-right:0.5rem;position:absolute;top:2px;right:2px;"
+      style="display:flex;align-items:right;flex-direction: row-reverse;padding:0.2rem;    background: rgb(248, 248, 248);"
     >
       <button
-        style="cursor:pointer;align:right;border:none;background:none;"
+        style="cursor:pointer;align:right;border:none;padding-top:0.2rem;background:none;"
         on:click={() => {
           documentsList = [];
           $referencesList = "";
         }}
       >
-        <i style="font-size: 0.75rem;" class="fas fa-trash-alt"></i>
+		    <Icon icon="mdi:trash-can-outline" height="1rem"/>
       </button>
     </div>
   {/if}
-</div>
 
 <div class="scrollable">
   <ul style="list-style-type: none; padding: 0;">
@@ -48,7 +45,7 @@
               $selectDoc = doc;
             }
           }}
-          style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;"
+          style="cursor: pointer; padding: 8px; width: 100%; text-align: left; border: none; background: none;border-bottom: 1px solid rgba(0,0,0,.1)"
         >
           <strong
             >{doc.doc.replace(/\.md$/, ".pdf").slice(0, 50)}{doc.doc.replace(
@@ -59,7 +56,7 @@
               : ""}
           </strong>
           <p style="margin-top:0.2rem;margin-bottom:0rem;">
-            {doc.chunks[0].chunk.slice(0, 50)}...
+            {doc.chunks[0].chunk.slice(0, 100)}...
           </p>
         </button>
       </li>
@@ -78,6 +75,7 @@
     padding: 0;
     border: none;
     list-style-type: none;
+  	border-left: 0.25rem solid rgb(0,0,0,0);
     background: rgb(248, 248, 248);
   }
   li:hover {
@@ -90,7 +88,6 @@
   }
 
   .scrollable {
-    max-height: 15vh;
     overflow-y: auto;
     overflow-x: hidden;
   }
