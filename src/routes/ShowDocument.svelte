@@ -202,7 +202,7 @@
       });
   };
   initialLoad();
-  $: if (isInitialized) queueRenderPage(pageNum);
+  $: if (isInitialized && loaded) queueRenderPage(pageNum);
 
   //turn page after certain time interval
   const onPageTurn = () => {
