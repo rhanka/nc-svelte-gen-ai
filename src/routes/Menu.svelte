@@ -1,7 +1,7 @@
 <!-- src/routes/Menu.svelte -->
 <script>
   import { createEventDispatcher } from "svelte";
-  import "@fortawesome/fontawesome-free/css/all.css";
+  import Icon from "@iconify/svelte";
   import { accessToken } from "./store.js";
 
   const dispatch = createEventDispatcher();
@@ -18,13 +18,11 @@
         $accessToken = null;
       }}
     >
-      <i class="fas fa-sign-out-alt"></i>
-      <!-- Logout icon -->
+      <Icon icon="mdi:logout" height="1.5rem" />
     </button>
   {:else}
     <button on:click={openLogin}>
-      <i class="fas fa-sign-in-alt"></i>
-      <!-- Login icon -->
+      <Icon icon="mdi:login" height="1.5rem" />
     </button>
   {/if}
 </div>
@@ -41,8 +39,5 @@
     border: none;
     background: none;
     cursor: pointer;
-  }
-  button i {
-    font-size: 1.5rem; /* Adjust the size as needed */
   }
 </style>
