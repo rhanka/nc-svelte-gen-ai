@@ -41,27 +41,10 @@
   $: console.log(nonConformitiesFilter);
 </script>
 
-<div style="position:relative;">
-  {#if nonConformitiesFilter.length > 0}
-    <div
-      style="display:flex;align-items:right;flex-direction: row-reverse;padding:0.2rem;    background: rgb(248, 248, 248);"
-    >
-      <button
-        style="cursor:pointer;align:right;border:none;padding-top:0.2rem;background:none;"
-        on:click={() => {
-          nonConformitiesFilter = [];
-          $referencesList = "";
-        }}
-      >
-		<Icon icon="mdi:trash-can-outline" height="1rem"/>
-      </button>
-    </div>
-  {/if}
-</div>
 <div class="scrollable">
   <ul style="list-style-type: none; padding: 0;">
     {#each $filteredNonConformities as item, index}
-      <li class:selected={$selectItem === item && $activeTabValue === 2}>
+      <li class:selected={$selectItem === item && $activeTabValue === 3}>
         <button
           type="button"
           use:ripple={{

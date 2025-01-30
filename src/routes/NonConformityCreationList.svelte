@@ -24,18 +24,6 @@
   }
 </script>
 
-<div style="position:relative;">
-    <div
-      style="display:flex;align-items:right;flex-direction: row-reverse;padding:0.2rem;    background: rgb(248, 248, 248);"
-    >
-      <button
-        style="cursor:pointer;align:right;border:none;padding-top:0.2rem;background:none;"
-        on:click={resetCreatedItem}
-      >
-		    <Icon icon="mdi:trash-can-outline" height="1rem"/>
-      </button>
-    </div>
-</div>
 <div class="scrollable">
   <ul style="list-style-type: none; padding: 0;">
     {#each ["000", "100", "200", "300", "400", "500"].filter((t) => t <= taskMask) as task}
