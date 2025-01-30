@@ -5,39 +5,31 @@
     import { Markdown } from 'tiptap-markdown';
 
     export let value;
-	let element;
-	let editor;
+    let editor, element;
+    let lastValue;
 
-    $: if (editor)  {
+    // Mettre à jour uniquement si value change depuis l'extérieur
+    $: if (editor && value !== lastValue) {
         editor.commands.setContent(value);
+        lastValue = value;
     }
 
-	onMount(() => {
-		editor = new Editor({
-			element: element,
-			extensions: [
-                StarterKit,
-                Markdown
-                ],
-			content: value,
-            onUpdate: ({ editor }) => {
-                const content = editor.storage.markdown.getMarkdown();
-                if (value !== content) {
-                    value = content;
-                }
-            },
-			onTransaction: () => {
-				// force re-render so `editor.isActive` works as expected
-				editor = editor;
-			},
-		});
-	});
+  onMount(() => {
+    editor = new Editor({
+      element,
+      extensions: [StarterKit, Markdown],
+      content: value,
+      onUpdate: ({ editor }) => {
+        const content = editor.storage.markdown.getMarkdown();
+        if (content !== value) {
+            lastValue = content;
+            value = content;
+        }
+      },
+    });
+  });
 
-	onDestroy(() => {
-		if (editor) {
-			editor.destroy();
-		}
-	});
+  onDestroy(() => editor?.destroy());
 </script>
 
 <div bind:this={element} />
