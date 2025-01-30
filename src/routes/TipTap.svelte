@@ -47,4 +47,8 @@
         border: none!important;
         outline: none!important;
     }
+
+    :global(.tiptap > ul > li) {
+        padding-bottom: 0.5rem;
+    }
 </style>
