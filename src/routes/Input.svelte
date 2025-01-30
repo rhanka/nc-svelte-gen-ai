@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { marked } from "marked";
+  import TipTap from "./TipTap.svelte";
   export let label = ""; // Le label affich� au-dessus
   export let value = ""; // La valeur de l'input
 
@@ -10,7 +11,6 @@
   // R�f�rence pour le span et l'input
   let span;
   let input;
-  let textarea;
 
   // Basculer entre le mode �dition et le mode affichage
   const toggleEditing = () => {
@@ -24,17 +24,6 @@
         span.textContent = value || " "; // Mise � jour du contenu du span
         input.style.width = `${span.offsetWidth + 4}px`; // Appliquer la largeur au champ input
       }
-    }
-  };
-  $: textarea && adjustHeight();
-
-  // Ajuster la hauteur du textarea en fonction de son contenu
-  const adjustHeight = () => {
-    if (textarea) {
-      textarea.focus(); // Focus sur le textarea
-      textarea.style.height = "auto"; // R�initialise la hauteur
-      let height = Math.max(textarea.scrollHeight, 12); // Stocke la hauteur minimale
-      textarea.style.height = `${height}px`; // D�finit la hauteur bas�e sur le contenu
     }
   };
 
@@ -76,20 +65,8 @@
       {/if}
     </div>
   {:else}
-    {#if isEditing}
-      <textarea
-        bind:value
-        on:mouseover={adjustHeight}
-        on:focus={adjustHeight}
-        on:blur={toggleEditing}
-        bind:this={textarea}
-      ></textarea>
-    {/if}
-    <div class="markdown-wrapper" on:click|preventDefault={toggleEditing}>
-      {@html marked((value && value.replace(/###/, "####")) || "").replace(
-        /(\[[^\]<>]*?\])/gi,
-        "<mark>$1</mark>",
-      )}
+    <div class="markdown-wrapper">
+      <TipTap bind:value={value}/>
     </div>
   {/if}
 </div>

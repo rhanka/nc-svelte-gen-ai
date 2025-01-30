@@ -25,7 +25,8 @@
     selectItem,
     selectDoc,
     activeTabValue,
-	showChatbot
+    resetCreatedItem,
+	  showChatbot
   } from "./store.js";
 
   let maxRows = 5000;
@@ -46,13 +47,9 @@
     );
   }
 
-  $: if ($selectItem !== null) {
-    $activeTabValue = 2;
-  }
 
   $: if ($selectDoc !== null) {
     selectDocUrl = `https://dataiku.genai-cgi.com/web-apps-backends/NONCONFORMITIES/3DGvs3v/doc/${encodeURIComponent($selectDoc.doc.replace(/\.md/, ".pdf"))}`;
-    $activeTabValue = 3;
   }
 
   async function getData() {
@@ -79,68 +76,80 @@
 
   $: tabs = [
     {
-	  rail: {
-		label: "Edit",
-		icon: "mdi:clipboard-edit-outline",
-		value: 1,
-		selected: $activeTabValue === 1,
-		active: true,
-		num: null
-	  },
-	  drawer: {
-		component: NonConformityCreationList
-	  },
-	  content: {
-		component: NonConformityCreation,
-		arguments: {
-			history: history
-		}
-	  }
+      rail: {
+        label: "Edit",
+        icon: "mdi:clipboard-edit-outline",
+        value: 1,
+        selected: $activeTabValue === 1,
+        active: true,
+        num: null
+      },
+      drawer: {
+        component: NonConformityCreationList,
+        selected: $createdItem.currentTask,
+        cleanCallBack: resetCreatedItem
+      },
+      content: {
+        component: NonConformityCreation,
+        arguments: {
+          history: history
+        }
+      }
+    },
+	  {
+      rail: {
+        label: "Tech Docs",
+        icon: "mdi:book-open-variant-outline",
+        value: 2,
+        selected: $activeTabValue === 2,
+        active: doc_num > 0,
+        num: doc_num
+      },
+      drawer: {
+        component: DocumentsList,
+        cleanCallBack: () => {
+          $referencesList["non_conformities"] = undefined;
+          $referencesList["tech_docs"] = undefined;
+        },
+        selected: $selectDoc,
+        arguments: {
+          documentsList: documentsList
+        }
+      },
+      content: {
+        component: ShowDocument,
+        arguments: {
+          url: selectDocUrl
+        },
+      }
     },
     {
-	  rail: {
-		label: "History",
-		icon: "mdi:clipboard-text-history-outline",
-		value: 2,
-		selected: $activeTabValue === 2,
-		active: nc_num > 0,
-		num: nc_num
-	  },
-	  drawer: {
-		component: NonConformityList,
-		arguments: {
-			nonConformities: nonConformitiesList,
-			nonConformitiesFilter: nonConformitiesFilter
-		}
-	  },
-      content: {
-		component: NonConformityDetail,
-      	arguments: {
-          selectedItem: $selectItem
-      	}
-	  }
-    },
-	{
-	  rail: {
-		label: "Tech Docs",
-		icon: "mdi:book-open-variant-outline",
-		value: 3,
-		selected: $activeTabValue === 3,
-		active: doc_num > 0,
-		num: doc_num
-	  },
+      rail: {
+        label: "History",
+        icon: "mdi:clipboard-text-history-outline",
+        value: 3,
+        selected: $activeTabValue === 3,
+        active: nc_num > 0,
+        num: nc_num
+      },
       drawer: {
-		component: DocumentsList,
-		arguments: {
-			documentsList: documentsList
-		}
-	  },
+        component: NonConformityList,
+        cleanCallBack: () => {
+          $referencesList["non_conformities"] = undefined;
+          $referencesList["tech_docs"] = undefined;
+        },
+        selected: $selectItem,
+        arguments: {
+          nonConformities: nonConformitiesList,
+          nonConformitiesFilter: nonConformitiesFilter
+        }
+      },
       content: {
-		component: ShowDocument,
-		arguments: {
-			url: selectDocUrl
-		},
-	  }
+        component: NonConformityDetail,
+        arguments: {
+          selectedItem: $selectItem
+        }
+      }
     }
   ];
 
@@ -168,7 +177,7 @@
     nc_num = nonConformitiesFilter.length;
   } else {
     nonConformitiesFilter = [];
-	nc_num = 0;
+	  nc_num = 0;
   }
 
   $: if ($referencesList && $referencesList["tech_docs"]) {
@@ -198,16 +207,15 @@
   } else {
     console.log("tech_docs clean");
     documentsList = [];
+    doc_num = 0;
   }
 
-  $: doc_num = documentsList.length;
-
-  $: expand = tabs.some(tab => tab.drawer && $activeTabValue === tab.rail.value);
+  $: expand = tabs.some(tab => tab.drawer && tab.rail.selected && (expand || !tab.drawer.selected) );
 
   const switchTab = (tab) => {
-	if (tab.rail.active) {
-		$activeTabValue = tab.rail.value;
-	}
+    if (tab.rail.active) {
+      $activeTabValue = tab.rail.value;
+    }
   };
 </script>
 
@@ -220,13 +228,32 @@
 		/>
 	{/each}
 </Rail>
-<Drawer {expand}>
+<Drawer bind:expand={expand}>
 	{#each tabs as tab}
-      {#if tab.drawer && $activeTabValue === tab.rail.value}
-		<svelte:component
-			this={tab.drawer.component}
-			{...tab.drawer.arguments}
-		/>
+    {#if tab.drawer && $activeTabValue === tab.rail.value}
+      <div style="position:relative;">
+        <div
+          style="display:flex;align-items:right;flex-direction: row-reverse;padding:0.2rem;    background: rgb(248, 248, 248);"
+        >
+
+          <button
+            style="cursor:pointer;align:right;border:none;padding:0.1rem;background:none;"
+            on:click={() => {expand=false;}}
+          >
+            <Icon icon="mdi:chevron-left" height="1rem"/>
+          </button>
+          <button
+            style="cursor:pointer;align:right;border:none;padding-top:0.2rem;background:none;"
+            on:click={tab.drawer.cleanCallBack}
+          >
+            <Icon icon="mdi:trash-can-outline" height="1rem"/>
+          </button>
+        </div>
+      </div>
+      <svelte:component
+        this={tab.drawer.component}
+        {...tab.drawer.arguments}
+      />
 	  {/if}
 	{/each}
 </Drawer>

@@ -14,26 +14,10 @@
   let searchQuery = "";
 </script>
 
-  {#if documentsList.length > 0}
-    <div
-      style="display:flex;align-items:right;flex-direction: row-reverse;padding:0.2rem;    background: rgb(248, 248, 248);"
-    >
-      <button
-        style="cursor:pointer;align:right;border:none;padding-top:0.2rem;background:none;"
-        on:click={() => {
-          documentsList = [];
-          $referencesList = "";
-        }}
-      >
-		    <Icon icon="mdi:trash-can-outline" height="1rem"/>
-      </button>
-    </div>
-  {/if}
-
 <div class="scrollable">
   <ul style="list-style-type: none; padding: 0;">
     {#each documentsList as doc, index}
-      <li class:selected={$selectDoc === doc && $activeTabValue === 3}>
+      <li class:selected={$selectDoc === doc && $activeTabValue === 2}>
         <button
           type="button"
           use:ripple={{ color: "rgba(82, 54, 171, 0.2)", duration: 0.6 }}
